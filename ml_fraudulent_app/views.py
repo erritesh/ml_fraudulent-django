@@ -6,6 +6,9 @@ from django.http import HttpResponse
 import ml_fraudulent_app
 
 # Create your views here.
+def login(request):
+    return render(request,"ml_fraudulent_app/login.html")
+    
 def home(request):
     return render(request,"ml_fraudulent_app/index.html")
 
