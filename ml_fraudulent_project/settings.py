@@ -38,6 +38,7 @@ INSTALLED_APPS = [
    # 'adminlte3_theme',
     #created apps
     'ml_fraudulent_app.apps.MlFraudulentAppConfig',
+    #'ml_fraudulent_app',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -82,8 +83,17 @@ WSGI_APPLICATION = 'ml_fraudulent_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'ml_fraud_detection',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': 'localhost',
+        'PORT': '3306',
+        'OPTIONS': {
+            # 'read_default_file': '/path/to/db.cnf',
+            'init_command': 'SET default_storage_engine=INNODB',
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+        }
     }
 }
 

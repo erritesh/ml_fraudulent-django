@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Django CRUD Operations</title>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script> 
+</head>
+<body>
+<div class="container">
+<table class="table table-striped">
+    <thead>
+      <tr>
+        <th>ID</th>
+		<th>Start time</th>
+		<th>Submission Time</th>
+		<th>Name</th>
+		<th>Email</th>
+        <th>Phone</th>
+        <th>SSN</th>
+        <th>Address</th>
+        <th>Renter</th>
+        <th>Unit Type</th>
+        <th>Amount</th>
+        <th>IP </th>
+        <th>Classification </th>
+        <th>AI_prediction </th>
+      </tr>
+    </thead>
+    <tbody>
+        {{applicant_details}}
+	{% for app in applicant_details %} 
+    {{app}} 
+      <tr>
+        <td>{{app.id}}</td>
+        <td>{{app.app_start_time}}</td>
+		    <td>{{app.app_submission_time}}</td>
+		    <td>{{app.applicant_name}}</td>
+	    	<td>{{app.app_email}}</td>
+        <td>{{app.app_onphone}}</td>
+        <td>{{app.app_ssn}}</td>
+        <td>{{app.app_mailing}}</td>
+        <td>{{app.renter}}</td>
+        <td>{{app.unit_type}}</td>
+        <td>{{app.requested_amount}}</td>
+        <td>{{app.origin_ip}}</td>
+        <td>{{app.classification}}</td>
+        <td>{{app.AI_prediction}}</td>
+      </tr>
+	  {% endfor %} 
+	</tbody>
+</table>	
+</div>
+</body>
+</html>
