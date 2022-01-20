@@ -3,11 +3,11 @@
 
 {% block header_dropdowns %}
 {% block user_info %}
-            {% if request.user.is_authenticated %}
+         {% comment %}  {% if request.user.is_authenticated %}  {% endcomment %}
             <li class="nav-item dropdown user-menu">
                 <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
                 <img src="{%avatar_url 128 %}" class="user-image img-circle elevation-2" alt="User Image">
-                  <span class="d-none d-md-inline">{% firstof request.user.get_short_name request.user.get_username %}</span>
+                  <span class="d-none d-md-inline">Admin{% firstof request.user.get_short_name request.user.get_username %}</span>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                   <!-- User image -->
@@ -29,7 +29,7 @@
                         <a href="#">Team</a>
                       </div>
                       <div class="col-4 text-center">
-                        <a href="#">Friends</a>
+                        <a href="#">Settings</a>
                       </div>
                     </div>
                     <!-- /.row -->
@@ -41,7 +41,7 @@
                   </li>
                 </ul>
               </li>
-            {% endif %}
+         {% comment %} {% endif %} {% endcomment %}
             {% endblock user_info %}
 
 {% endblock header_dropdowns %}

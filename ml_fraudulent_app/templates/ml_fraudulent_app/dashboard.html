@@ -1,8 +1,137 @@
-<htm>
-    <head> 
-        <title>Dashboard</title>
-    </head>
-    <body>
-    <h1> This is Dashboard Page </h1>
-    </body>
-    </html>
+{% extends "ml_fraudulent_app/admin/base_site.html" %}
+{% load i18n static %}
+{% load admin_menu %}
+
+{% block extrastyle %}
+{{ block.super }}
+<!-- <link rel="stylesheet" type="text/css" href="{% static 'admin/css/dashboard.css' %}" /> -->
+{% endblock %}
+
+{% block coltype %}colMS{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="row mb-2">
+    <div class="col-sm-4">
+        <h2>{{title}}</h2>
+    </div>
+    <div class="col-sm-8">
+        <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="#"><i class="fas fa-tachometer-alt"></i> {% trans 'Home' %}/Dashboards</a></li>
+            {% for app in app_list %}
+            <li class="breadcrumb-item active">{{ app.name }}</li>
+            {% endfor %}
+        </ol>
+    </div>
+</div>
+{% endblock %}
+{% endif %}
+<!-- main Code start Here -->
+{% block content %}
+                <!-- /.box-body -->
+           
+                <section class="content">
+                    <div class="container-fluid">
+                      <!-- Small boxes (Stat box) -->
+                      <div class="row">
+              
+                      <!-- ./col -->
+                      <div class="col-lg-3 col-2">
+                          <!-- small box -->
+                          <div class="small-box bg-dark">
+                            <div class="inner">
+                              <h3>53<sup style="font-size: 20px"></sup></h3>
+                              <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width:20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"> </div>
+                             </div>
+                              <p><b>Total</b></p>
+                            </div>
+                            
+                          </div>
+                        </div>
+                        <div class="col-lg-3 col-2">
+                            <!-- small box -->
+                            <div class="small-box bg-secondary">
+                              <div class="inner">
+                                <h3 style="color:#ffffff;">63</h3>
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" style="width:20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"> </div>
+                                 </div>
+                                <p style="color:#ffffff;"><b>Pending</b></p>
+                              </div>
+                              
+                            </div>
+                          </div>
+                          <div class="col-lg-3 col-2">
+                            <!-- small box -->
+                            <div class="small-box bg-danger">
+                              <div class="inner">
+                                <h3>43</h3>
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" style="width:20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"> </div>
+                                 </div>
+                                <p> <b>Fraudulent</b></p>
+                              </div>
+                              
+                            </div>
+                          </div>
+                          <div class="col-lg-3 col-2">
+                            <!-- small box -->
+                            <div class="small-box bg-success">
+                              <div class="inner">
+                                <h3>65</h3>
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" style="width:20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"> </div>
+                                 </div>
+                                <p><b>Non-Fraudulent</b></p>
+                              </div>
+                            </div>
+                          </div>
+                          <!-- ./col -->
+                        </div>
+                    </section>
+
+                    <div class="container">
+   
+                        <!--<button type="button" name="analyse" class="btn btn-success" >Analyze</button> -->
+                        <table class="table table-hover" id="enhanceData">
+                            <thead>
+                                <tr>
+                                  <th>ID</th>
+                                  <th>Applicant Name</th>
+                                  <th>Classification</th>
+                                  <th>Origin IP </th>
+                                  <th>Geolocation </th>
+                                  <th> </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {% for enApp in applicant_details %} 
+                                <tr>
+                                  <td>{{enApp.app_id}}</td> 
+                                  <td>{{enApp.applicant_name}}</td>
+                                  <td>{{enApp.classification}}</td>
+                                  <td>{{enApp.origin_ip}}</td>
+                                  <td>{{enApp.geoLocation}}</td>
+                                  <td> 
+                                    <!--<a href="javascript:void(0)" class="btn btn-primary edit" data-id="review">Review</a> -->
+                                    <button class="btn" a href="javascript:void(0)" data-id="review"> <i class="fas fa-sync-alt"></i></a></button>
+                                    
+                                   
+                                  </td>
+                                </tr>
+                                {% endfor %} 
+                            </tbody>
+                        </table>
+                    </div>
+    {% endblock %}
+
+{% block javascript %}
+{% include 'ml_fraudulent_app/adminlte/lib/_scripts.html' %}
+<script>
+    $(document).ready( function () {
+      $('#enhanceData').DataTable();
+  } );
+  </script>
+{% endblock %}
