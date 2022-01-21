@@ -164,3 +164,7 @@ def menu_tag(context):
 @register.simple_tag(takes_context=True, name='icon')
 def icon_tag(context):
     return Menu.get_model_icon(context)
+
+@register.filter
+def in_category(things, category):
+    return things.filter(category=category)

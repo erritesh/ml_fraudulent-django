@@ -3,7 +3,10 @@ from django import http
 from django.http.response import HttpResponse
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
-from ml_fraudulent_app.models import Applicant_Details
+from .models import Applicant_Details
+from django.http import JsonResponse
+from .filters import RiskFilter
+
 
 
 
@@ -21,7 +24,7 @@ def ApplicantEdit(request):
     context= {
         "applicant_details":applicant_details
     }
-    return redirect(request,'ml_fraudulent_app/index.html',applicant_details)
+    return redirect(request,'ml_fraudulent_app/index.html',context)
 
 def ApplicantUpdate(request,app_id):
     if request.method =="POST":
@@ -73,3 +76,15 @@ def dashboard(request):
 def logout(request):
     return render(request,"ml_fraudulent_app/logout.html")
 
+
+def riskVal(request):
+    queryset = Applicant_Details.objects.filter(AI_prediction__range=(0.20,0.50)).count()
+    context = {"query_set":queryset}
+    return render(request,"ml_fraudulent_app/index.html",context)
+
+'''
+def riskSearch(request):
+    risk_list = Applicant_Details.objects.filter(AI_prediction__range=(0.20,0.50)).count()
+    risk_filter = RiskFilter(request.GET, queryset=risk_list)
+    return render(request, 'ml_fraudulent_app/index.html', {'filter': risk_filter})
+    '''

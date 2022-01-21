@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.urls import path, include
 from .import views
 
+
 urlpatterns = [
     path('login',views.login,name="login"),
     path('', views.home, name="home"),
@@ -12,4 +13,7 @@ urlpatterns = [
     #path('show',views.show),
     path('applicantEdit',views.ApplicantEdit,name='applicantEdit'),
     path('applicantUpdate/<str:app_id>',views.ApplicantUpdate,name='applicantUpdate'),
+    path('riskVal',views.riskVal,name="riskVal"),
+    
+    
 ]
