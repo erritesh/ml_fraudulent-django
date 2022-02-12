@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 import os
+from django.contrib import messages
+
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -45,7 +49,8 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',  
+    'django.contrib.staticfiles',
+      
 ]
 
 MIDDLEWARE = [
@@ -87,8 +92,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'ml_fraud_detection',
         'USER': 'root',
-        'PASSWORD': '',
-        'HOST': 'localhost',
+        'PASSWORD': 'Admin',
+        'HOST': '127.0.0.1',
         'PORT': '3306',
         'OPTIONS': {
             # 'read_default_file': '/path/to/db.cnf',
@@ -149,6 +154,13 @@ TIME_INPUT_FORMATS = [
     '%H:%M',        # '14:30'
 ]
 
+MESSAGE_TAGS = {
+    messages.DEBUG: 'alert-primary',
+    messages.INFO: 'alert-info',
+    messages.SUCCESS: 'alert-secondary',
+    messages.WARNING: 'alert-warning',
+    messages.ERROR: 'alert-danger',
+}
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
@@ -164,3 +176,42 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+# Ml Fraudulent #Logging Information
+LOGGING = {
+    'version': 1,
+    # Version of logging
+    'disable_existing_loggers': False,
+    #disable logging 
+    # Handlers 
+    'handlers': {
+        'file': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': './logs/ml_fraudulent-debug.log',
+            'formatter': 'file',
+        },
+
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'console',
+        },
+    },
+    # Loggers 
+    'loggers': {
+        'django': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG',
+            'propagate': True,
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'DEBUG')
+        },
+    },
+
+    'formatters': {
+        'console': {
+            'format': '%(name)-12s %(levelname)-8s %(message)s'
+        },
+        'file': {
+            'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
+        },
+    },
+}

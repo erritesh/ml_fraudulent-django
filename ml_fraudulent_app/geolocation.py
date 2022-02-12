@@ -10,7 +10,7 @@ try:
     connection = mysql.connector.connect(host='localhost',
                                          database='ml_fraud_detection',
                                          user='root',
-                                         password='')
+                                         password='Admin')
     if connection.is_connected():
         sql_select_Query = "SELECT * FROM ml_fraudulent_app_applicant_details"
         cursor = connection.cursor()
@@ -19,7 +19,7 @@ try:
         records = cursor.fetchall()
         print("Total number of rows in table: ", cursor.rowcount)
         print("\nOrigin IPs each row")
-        reader = geoip2.database.Reader('mmdb/GeoLite2-City.mmdb')
+        reader = geoip2.database.Reader('ml_fraudulent_app/mmdb/GeoLite2-City.mmdb')
         for row in records:
             ids= row[0]
             ips= row[11]

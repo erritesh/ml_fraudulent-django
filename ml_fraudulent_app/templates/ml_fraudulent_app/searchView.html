@@ -1,0 +1,90 @@
+{% extends "ml_fraudulent_app/admin/base_site.html" %}
+{% load i18n static %}
+{% load admin_menu %}
+
+{% block extrastyle %}
+{{ block.super }}
+<!-- <link rel="stylesheet" type="text/css" href="{% static 'admin/css/dashboard.css' %}" /> -->
+{% endblock %}
+
+{% block coltype %}colMS{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="row mb-2">
+    <div class="col-sm-4">
+        <h2>{{title}}</h2>
+    </div>
+    <div class="col-sm-8">
+        <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="#"><i class="fas fa-tachometer-alt"></i> {% trans 'Home' %}/Search</a></li>
+            {% for app in app_list %}
+            <li class="breadcrumb-item active">{{ app.name }}</li>
+            {% endfor %}
+        </ol>
+    </div>
+</div>
+{% endblock %}
+{% endif %}
+
+<!-- main Code start Here -->
+{% block content %}
+                <!-- /.box-body -->
+           
+                <table class="table table-hover" id="ApplicantSearchData" style="width:100%">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Submission Time</th>
+                        <th>Applicant Name</th>
+                        <th>Origin IP </th>
+                        <th>Geolocation </th>
+                        <th>Classification </th>
+                        <th>Risk Score </th>
+                      </tr>
+                    </thead>
+                    <tbody>  
+                     {% comment %} {% for app in applicant_list %}  {% endcomment %}
+                     {% if applicant_data %}  
+                     {% for app in applicant_data %} 
+                      <tr>
+                        <td>{{app.app_id}}</td> 
+                        <td>{{app.app_submission_time | date:"Y-m-d, H:m:s"}}</td>
+                        <td>{{app.applicant_name}}</td>
+                        <td>{{app.origin_ip}}</td>
+                        <td>{{app.geoLocation}}</td>
+                        <td>{{app.classification}}</td>
+                        <td>{{app.AI_prediction}} </td>
+                            
+                      </tr>
+                      {% empty %}
+                        <tr><td colspan="5">Currently no Data Available</td></tr>
+                      {% endfor %}
+                      {% endif %}
+                    </tbody>
+                   
+                   
+                </table>
+
+        
+
+    {% endblock %}
+    {% block javascript %}
+{% include 'ml_fraudulent_app/adminlte/lib/_scripts.html' %}
+<script>
+    $(document).ready( function () {
+     
+      $('#ApplicantSearchData').DataTable({
+        searchPanes: {
+            layout: 'columns-5'
+        },
+        dom: 'PBfrtip',
+        buttons: [
+            'copy', 'csv', 'excel', 'pdf', 'print'
+        ],
+        });
+  });
+
+</script>
+{% endblock %}

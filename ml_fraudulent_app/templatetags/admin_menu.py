@@ -9,7 +9,7 @@ from django import template
 import re
 
 from django.urls import reverse
-
+import calendar
 
 class _Menu:
     parents = []
@@ -168,3 +168,18 @@ def icon_tag(context):
 @register.filter
 def in_category(things, category):
     return things.filter(category=category)
+
+
+@register.filter
+def month_name(month_number):
+    return calendar.month_name[month_number]
+
+@register.filter(name='split')
+def split(value, key):
+    """
+        Returns the value turned into a list.
+    """
+    return value.split(key)
+
+
+
