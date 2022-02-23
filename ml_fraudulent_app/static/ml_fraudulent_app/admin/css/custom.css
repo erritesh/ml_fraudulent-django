@@ -41,3 +41,8 @@ thead input {
 .card {
   margin-top: 1rem!important;
 }
+
+hr.new5 {
+  border: 10px solid green;
+  border-radius: 5px;
+}

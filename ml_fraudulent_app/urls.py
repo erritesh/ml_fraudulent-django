@@ -1,7 +1,7 @@
 from os import name
 from django.contrib import admin
 from django.urls import path, include,re_path
-from ml_fraudulent_app import searchViews, views,dashboardViews
+from ml_fraudulent_app import searchViews, views,dashboardViews,geolocationView,evaluateViews
 
 
 urlpatterns = [
@@ -16,7 +16,10 @@ urlpatterns = [
     #path('handler404',views.handler404,name="handler404"),
     path('reset_applicant', views.reset_applicant,name='reset_applicant'),
     path('output',views.output,name="output"),
-    path('geolocationView',views.geolocationView,name="geolocationView"),
+    path('geolocationView',geolocationView.geolocationView,name="geolocationView"),
     #path('pageview',views.pageview,name="pageview"),
-    re_path(r'^pageview/$', views.pageview),    
+    #path('evaluateViews',evaluateViews.evaluateViews,name="evaluateViews"),
+    #re_path(r'^pageview/$', views.pageview),
+    path('evaluate',evaluateViews.evaluateViews,name="evaluate"),
+    #path('getpageno',views.getpageno,name="getpageno"),    
 ]

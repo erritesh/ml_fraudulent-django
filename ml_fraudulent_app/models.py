@@ -25,15 +25,14 @@ class Applicant_Details(models.Model):
     app_mailing = models.TextField()
     renter = models.IntegerField(blank=True, null=True)
     unit_type = models.CharField(max_length=100)
-    requested_amount = models.DecimalField(
-                         max_digits = 10,
-                         decimal_places = 2)
+    # requested_amount = models.DecimalField(
+    #                      max_digits = 10,
+    #                      decimal_places = 2)
+    requested_amount = models.IntegerField(blank=True, null=True)
     origin_ip = models.CharField(max_length=18)
     classification = models.CharField(max_length=20)
     #classification = models.PositiveSmallIntegerField(choices=CATEGORY_TYPES)
-    AI_prediction = models.DecimalField(
-                         max_digits = 4,
-                         decimal_places = 2, null=True, blank=True)
+    
     geoLocation = models.CharField(max_length=30, null=True, blank=True, default='Null')
 
     #def __str__(self):
@@ -43,14 +42,15 @@ class Applicant_Details(models.Model):
 class Risk_Table(models.Model):
     #app_id = models.AutoField(primary_key=True)
     app = models.ForeignKey(Applicant_Details, primary_key=True,unique=True, blank=True, on_delete=models.CASCADE)
-
     classification = models.CharField(max_length=50)
     predict_class = models.CharField(max_length=50)
-    Risk_Score =models.IntegerField(blank=True, null=True)
-    Decision_Criteria = models.CharField(max_length=255)
+    Risk_Score =models.DecimalField(
+                          max_digits = 3,
+                          decimal_places = 2)
+    Decision_Criteria = models.CharField(max_length=1000)
 
-    class Meta:
-        managed = False
+    # class Meta:
+    #     managed = False
         
 
     #def __str__(self):
@@ -74,9 +74,7 @@ class Input_Table(models.Model):
                          decimal_places = 2)
     origin_ip = models.CharField(max_length=20)
     classification = models.CharField(max_length=30)
-    AI_prediction = models.DecimalField(
-                         max_digits = 4,
-                         decimal_places = 2, null=True, blank=True)
+    
     geoLocation = models.CharField(max_length=30, null=True, blank=True, default='Null')
 
     def __str__(self):

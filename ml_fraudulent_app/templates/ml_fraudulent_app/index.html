@@ -21,6 +21,9 @@ thead input {
 .card {
     margin-top: 1rem!important;
   }
+  .list-group-item {
+    padding: 6px 10px
+}
   
 </style>
 <div class="row mb-2">
@@ -54,7 +57,7 @@ thead input {
             <div>
             <progress value="{{ low_query_set }}" max="{{ total_query_set }}"> </progress>
             </div>
-                <p>Low Risk</p>
+                <span><b>Low Risk</b></span>
             </div>
             <div class="icon">
                 <i class="far fa-bookmark"></i>  
@@ -70,7 +73,7 @@ thead input {
         <div>
         <progress value="{{ medium_query_set }}" max="{{ total_query_set }}"> </progress>
         </div>
-            <p style="color:#ffffff;">Medium Risk</p>
+            <span style="color:#ffffff;"><b>Medium Risk</b></span>
       </div>
             <div class="icon">
                 <i class="far fa-bell"></i>
@@ -85,7 +88,7 @@ thead input {
            <div>
            <progress value="{{ high_query_set }}" max="{{ total_query_set }}"> </progress>
            </div>
-             <p style="color:#ffffff;">High Risk</p>
+             <span style="color:#ffffff;"><b>High Risk</b></span>
             </div>
             <div class="icon">
                 <i class="fas fa-biohazard"></i>    
@@ -100,9 +103,9 @@ thead input {
             <div>
             <progress value="{{ critical_query_set }}" max="{{ total_query_set }}"> </progress>
             </div>
-                <p>Critical Risk</p>
+                <span><b>Critical Risk</b></span>
             </div>
-            <div class="icon">
+            <div class="icon">       
                 <i class="fas fa-exclamation-triangle"></i>  
         </div>
     </div>
@@ -116,7 +119,9 @@ thead input {
     <div class="row">
         <div class="col">
              
-<button type="button" href="#" class="btn btn-outline-dark">Re-evaluate</button>   
+{% comment %} <button class="btn btn-outline-dark" type="submit" onclick="location.href='{% url 'evaluate' %}'" name='evaluate'>Re-evaluate</button> {% endcomment %}
+<button class="btn btn-outline-dark" a href="javascript:void(0)" data-id="evaluate" onclick="reevaluate()">  Re-evaluate</a></button>
+
 
         {% comment %}<button type="button" href="{% url 'reset_applicant' %}" class="btn btn-outline-dark">Reset</button> {% endcomment %}
         <input type="button" class="btn btn-outline-dark" id='script' name="scriptbutton" value=" Reset " onclick="goPython()">
@@ -125,19 +130,21 @@ thead input {
             <button class="btn btn-outline-dark" a href="javascript:void(0)" data-id="geolocation" onclick="geolocationPython()"> Geolocation Update</a></button>
         </div>  
         </div> 
-
-        <hr class="mb-3"/>
-
-    <div class="row"> 
+  <hr class="mb-3"/>
     <table class="table table-hover" id="usersData" style="width:100%">
-        <select class="custom-select" name="pageno" id="pageno" style="width: 150px">
-            <option selected>Select Page</option>
-            <option value="10">10</option>
-            <option value="100">100</option>
-            <option value="500">500</option>
-            
-        </select>  
-    </div> 
+
+      
+        {% comment %} <label>Show 
+          <select name="userstable_length" aria-controls="userstable" class="" onchange="showValue(this)" id="pageno">
+          <option value="10">10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select> 
+        entries
+      </label> {% endcomment %}
+     
+
 
         <thead>
           <tr>
@@ -162,26 +169,26 @@ thead input {
             <td>{{app.origin_ip}}</td>
             <td>{{app.geoLocation}}</td>
             <td>{{app.classification}}</td>
-            <td>{{app.AI_prediction}}
-                {% if app.AI_prediction <= 0.25 %}
+            <td>{{app.risk_table__Risk_Score}}
+                {% if app.risk_table__Risk_Score <= 25 %}
                 <div class="progress progress-xs progress-striped active">
                     <div class="progress-bar bg-success" style="width:25%"></div>
                   </div> 
-                  {% elif app.AI_prediction <= 0.50 %} 
+                  {% elif app.risk_table__Risk_Score <= 50 %} 
                   <div class="progress progress-xs">
                     <div class="progress-bar bg-info" style="width: 50%"></div>
                   </div>
-                  {% elif app.AI_prediction <= 0.75 %}
+                  {% elif app.risk_table__Risk_Score <= 75 %}
                   <div class="progress progress-xs">
                     <div class="progress-bar bg-warning" style="width: 75%"></div>
                   </div>
-                  {% elif app.AI_prediction <= 1.00 %}
+                  {% elif app.risk_table__Risk_Score <= 100 %}
                   <div class="progress progress-xs">
                     <div class="progress-bar bg-danger" style="width: 95%"></div>
                   </div>
                   {% else %}
                   <div class="progress progress-xs">
-                    <div class="progress-bar bg-secondary" style="width: 10%"></div>
+                    <div class="progress-bar bg-secondary" style="width: 0%"></div>
                   </div>
                   {% endif %}
                 </td>
@@ -263,15 +270,18 @@ thead input {
                             <label for="name" class="col-sm-6 control-label">End Time</label>
                           </div>
                     </div>
+
                     <div class="row">
                         <div class="col">
-                            <input type="text" class="form-control" id="app_start_time" name="app_start_time" value="{{app.app_start_time | date:"Y-m-d H:m:s"}}">
+                            <input type="datetime" class="form-control" id="app_start_time" name="app_start_time" value="{{app.app_start_time | date:"Y-m-d H:m:s"}}">
                         </div>
                         <div class="col">
-                            <input type="text" class="form-control" id="app_submission_time" name="app_submission_time" value="{{app.app_submission_time | date:"Y-m-d H:m:s"}}">
+                            <input type="datetime" class="form-control" id="app_submission_time" name="app_submission_time" value="{{app.app_submission_time | date:"Y-m-d H:m:s"}}">
                           </div>
                     </div>
                 </div>
+                
+
                 <div class="form-group">
                 <div class="row">
                     <div class="col">
@@ -328,7 +338,7 @@ thead input {
                   </div>
                   <div class="row">
                     <div class="col">
-                        <input type="text" class="form-control" id="renter" name="renter" placeholder="Enter Renter" value="{{app.renter}}" required="">
+                        <input type="number" class="form-control" id="renter" name="renter" placeholder="Enter Renter" value="{{app.renter}}" required="">
                     </div>
                     <div class="col">
                         <input type="text" class="form-control" id="unit_type" name="unit_type" placeholder="Enter Unit Type" value="{{app.unit_type}}" required="">
@@ -383,7 +393,10 @@ thead input {
                         </select>  
                     </div>
                     <div class="col">
-                        <input type="text" class="form-control" id="AI_prediction" name="AI_prediction" value="{{app.AI_prediction}}" required>
+                        {% comment %} <input type="text" class="form-control" id="risk_score" name="risk_score" value="{{app.risk_table__Risk_Score}}" required> {% endcomment %}
+                        <div class="list-group-item disabled" aria-disabled="true" role="alert">
+                          {{app.risk_table__Risk_Score}}
+                        </div>
                     </div>
                   </div>
                 </div>
@@ -399,20 +412,40 @@ thead input {
                                 <p class="card-text"><b>Risk Identifier</b> </p>
                             </div>
                           </div>
-
+                          
+                          
                           <div class="row">
+                            {% if app.risk_table__predict_class %}
                             <div class="col">
-                                <p class="list-group-item list-group-item-light" >{{app.risk_table__predict_class}}</p><br>
+                                <p class="list-group-item disabled" aria-disabled="true" >{{app.risk_table__predict_class}}</p><br>
                             </div>
+                            {% else %}
                             <div class="col">
-                            {% for rsk in app.risk_table__Decision_Criteria|split:"," %}
+                              <div class="list-group-item disabled" aria-disabled="true" role="alert">
+                                Value Not Found In Predict Class !
+                              </div>
+                            </div>
+                            {% endif %}
+                            <div class="col"> 
+                            {% if app.risk_table__Decision_Criteria %}
+                            {% comment %} {% for rsk in app.risk_table__Decision_Criteria %} {% endcomment %}
+                            {% for rsk in app.risk_table__Decision_Criteria|split:"," %}  
                             <div class="col-sm-12">
-                            
-                            <ul class="list-group">
-                                    <li class="list-group-item list-group-item-light">{{ rsk }}</li><br>
-                                  </ul>
+                             <ul class="list-group">
+                                    <li class="list-group-item disabled" aria-disabled="true">{{ rsk }}</li><br>
+                                  </ul> 
+                                 
+                                
                                 </div>
+                              
                              {% endfor %}
+                             {% else %}
+                             <div class="list-group-item disabled" aria-disabled="true" role="alert">
+                              Decision crireria not found !
+                            </div>
+                             
+                             {% endif%}
+                             
                             </div>
                           </div>   
                     </div>
@@ -444,6 +477,28 @@ thead input {
 {% block javascript %}
 {% include 'ml_fraudulent_app/adminlte/lib/_scripts.html' %}
 <script>
+    function showValue(){
+      var selectedpage = document.getElementById("pageno").value;
+      var iNum = parseInt(selectedpage); //Output will be 234.
+      console.log (iNum)
+
+      $.ajax({
+        type: "GET",
+        url: '/',
+        data:{
+              'selectedpage': iNum,
+              },
+    dataType : "text",
+    success: function(data) {
+        // do whatever in here for success, errors
+        console.log("pageno transfered to view page")
+        
+                }
+            })  
+          }
+
+
+
     function goPython(){
         $.ajax({
          url: "/output",
@@ -460,39 +515,34 @@ thead input {
            }).done(function() {
             alert('Page selected');
            });
-        
-    } {% endcomment %}
-
-    $("#pageno").on("change", function(){
-        var selectedValue = $(this).text();
-        console.log(selectedValue);
-      
-        $.ajax({
-          url : "pageview/",
-          type : "GET",
-          data : {"selectedpage" : selectedValue},
-          dataType : "json",
-          success : function(){
-            alert('Page selected');
-          }
-        });
-      });
-
-
+    }  {% endcomment %}
+  
     function geolocationPython(){
         $.ajax({
          url: "/geolocationView",
          context: document.body
         }).done(function() {
-         alert('finished Geo Location python script');
+         alert('Geolocation has been updated successfully !');
         });
     }
+function reevaluate(){
+  $.ajax({
+    url: "/evaluate",
+    context: document.body
+   }).done(function() {
+    alert('ML scripts has been completed successfully !');
+   });
+}
 
 /* Data Table Function */
 
 
 $(document).ready(function () {
             $('#usersData').DataTable({
+              
+
+            "sDom": "lfrti",
+            
             bPaginate: false,
             paging: false,
             stateSave:true,

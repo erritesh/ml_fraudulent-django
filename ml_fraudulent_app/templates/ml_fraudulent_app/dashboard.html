@@ -5,7 +5,21 @@
 
 {% block extrastyle %}
 {{ block.super }}
-<!-- <link rel="stylesheet" type="text/css" href="{% static 'admin/css/dashboard.css' %}" /> -->
+<!-- <link rel="stylesheet" type="text/css" href="{% static 'admin/css/dashboard.css' %}" /> 
+<link rel="stylesheet" type="text/css" href="{% static 'ml_fraudulent_app/admin/css/custom.css' %}" /> -->
+
+<style>
+  hr.new5 {
+    border: 4px solid #ffffff;
+    margin: 0px;
+    padding: 0px;
+    size: 5% ;
+    width: 100%;
+  }
+  .card {
+    margin-top: 0rem!important;
+  }
+</style>
 {% endblock %}
 
 {% block coltype %}colMS{% endblock %}
@@ -32,8 +46,8 @@
 <!-- main Code start Here -->
 {% block content %}
 {% for res in finalset %}
-                      {{ res.}}
-                      {% endfor %}
+            {{ res.}}
+   {% endfor %}
            
                 <section class="content">
                     <div class="container-fluid">
@@ -52,11 +66,13 @@
                                   <div class="small-box bg-dark">
                                     <div class="inner">
                                       <h3>{{ total_query_set }}<sup style="font-size: 20px"></sup></h3>
-                                      <!--<div>
-                                        <progress min="0" max="{{ total_query_set }}" value="{{ total_query_set }}">
-                                      </div> -->
-                                      <hr size="5%" width="100%" color="#FFFFFF">  
-                                      <p><b>Total</b></p>
+                                     <div>
+                                        <progress min="0" max="100" value="100">
+                                      </div> 
+                                       <!-- <hr class="new5"> </hr> -->
+                                      
+                                      <span><b>Total</b></span>
+                                     
                                     </div>
                                   </div>
                                 </div>
@@ -68,7 +84,7 @@
                                         <div>
                                           <progress value="{{ pending_query_set }}" max="{{ total_query_set }}" >
                                         </div>
-                                        <p style="color:#ffffff;"><b>Pending</b></p>
+                                        <span style="color:#ffffff;"><b>Pending</b></span>
                                       </div>
                                       
                                     </div>
@@ -81,7 +97,7 @@
                                         <div>
                                           <progress min="0" max="{{ total_query_set }}" value="{{ fraud_query_set }}">
                                         </div>
-                                        <p> <b>Fraudulent</b></p>
+                                        <span> <b>Fraudulent</b></span>
                                       </div>
                                       
                                     </div>
@@ -94,7 +110,7 @@
                                         <div>
                                           <progress min="0" max="{{ total_query_set }}" value="{{ nonFraud_query_set }}">
                                         </div>
-                                        <p><b>Non-Fraudulent</b></p>
+                                        <span><b>Non-Fraudulent</b></span>
                                       </div>
                                     </div>
                                   </div>
@@ -246,7 +262,7 @@
                       <div class="col-lg-12">
                         <div class="card">
                           <div class="card-header border-0">
-                            <h3 class="card-title">Geotagging Origin IPs</h3>
+                            <h3 class="card-title">Geo-tagging Origin IP's</h3>
                           </div>
                           <div class="card-body table-responsive p-0">  
                           <div id="map1"></div>
@@ -266,9 +282,6 @@
       $('#enhanceData').DataTable();
   } );
 
-  
-
-
   var ctx = document.getElementById("riskDashboard").getContext("2d")
   var riskDashboardx = new Chart(ctx,{
       type:"bar",
@@ -280,8 +293,8 @@
               data: [{{ critical_queryset }}, {{ high_queryset }}, {{ medium_queryset }}, {{ low_queryset }}],
               label: "Risk Score",
               backgroundColor: [
-                '#dc3545', // for critical red
-                '#FFA500', // for high orange
+                '#dc3545', // for critical red 
+                '#FFA500', // for high orange 
                 '#FDDA0D', // for medium yellow
                 '#28a745', // for low green
               ], 
@@ -378,11 +391,7 @@ var lineDashboard = new Chart(ctx,{
             label: "Count",
             backgroundColor: [
               '#6c757d', // for  gray 
-              '#dc3545', // for  red
-              '#28a745', // for  green
-              '#6c757d', // for  gray 
-              '#dc3545', // for  red
-              '#28a745',
+              
             ], 
         },
         ],

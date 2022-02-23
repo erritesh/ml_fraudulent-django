@@ -12,17 +12,17 @@ import plotly
 
 
 def dashboard(request):
-    applicant_details = Applicant_Details.objects.all().values('AI_prediction', 'app_email', 'app_id', 'app_mailing', 'app_onphone', 'app_ssn', 'app_start_time', 'app_submission_time', 'applicant_name', 'classification', 'geoLocation', 'origin_ip', 'renter', 'requested_amount', 'risk_table__Decision_Criteria', 'unit_type')
+    applicant_details = Applicant_Details.objects.all().values('app_email', 'app_id', 'app_mailing', 'app_onphone', 'app_ssn', 'app_start_time', 'app_submission_time', 'applicant_name', 'classification', 'geoLocation', 'origin_ip', 'renter', 'requested_amount', 'risk_table__Decision_Criteria', 'unit_type')
 
     total_query_set = Applicant_Details.objects.all().count()
     fraud_query_set = Applicant_Details.objects.filter(classification='Fraud').count()
     nonFraud_query_set = Applicant_Details.objects.filter(classification='Not_Fraud').count()
     pending_query_set = Applicant_Details.objects.filter(classification='').count()
     # Risk score count
-    low_queryset = Applicant_Details.objects.filter(AI_prediction__range=(0.00,0.25)).count()
-    medium_queryset = Applicant_Details.objects.filter(AI_prediction__range=(0.26,0.50)).count()
-    high_queryset = Applicant_Details.objects.filter(AI_prediction__range=(0.51,0.75)).count()
-    critical_queryset = Applicant_Details.objects.filter(AI_prediction__range=(0.76,1.00)).count()
+    low_queryset = Risk_Table.objects.filter(Risk_Score__range=(0,25)).count()
+    medium_queryset = Risk_Table.objects.filter(Risk_Score__range=(26,50)).count()
+    high_queryset = Risk_Table.objects.filter(Risk_Score__range=(51,75)).count()
+    critical_queryset = Risk_Table.objects.filter(Risk_Score__range=(76,100)).count()
 
     Pending_Predicted_Fraud = Risk_Table.objects.filter(classification='') & Risk_Table.objects.filter(predict_class='Fraud')
     pending_pre_fraud= Pending_Predicted_Fraud.count()
@@ -36,66 +36,82 @@ def dashboard(request):
     amt_less =[]
     time_grt=[]
     time_less =[]
-     
+    finalAmtGrtVal = 0
+    finalAmtLessVal = 0
+    finalTimeGrtVal = 0
+    finalTimeLessVal = 0 
     
     risk_table = Risk_Table.objects.all()
-    for risk in risk_table:
-        req_amt = str(risk.Decision_Criteria).split(",")
-
-        if(len(req_amt)>1):
-            reqested_amt.append(req_amt[0])
-            app_time.append(req_amt[1])
- 
-        else:
-            reqested_amt.append(req_amt[0])
+   
+    if not risk_table:
+        print("No data in risk table")
+        pass
+        
+    else:
+        for risk in risk_table:
             
-    for y in reqested_amt:
-        if (y.find('<=') != -1):
-            amt_less.append(y)
-        if (y.find('>')!=-1):
-            amt_grt.append(y)
-    finalAmtGrtVal= len(amt_grt)
-    #print(finalAmtGrtVal)
-    finalAmtLessVal= len(amt_less)
-    
-    for i in app_time:
-        if (i.find('<=')!=-1):
-            time_less.append(i)
-        if(i.find('>')!=-1):
-            time_grt.append(i)
+            req_amt = str(risk.Decision_Criteria).split(",")
 
-    finalTimeGrtVal= len(time_grt)
+            if(len(req_amt)>1):
+                reqested_amt.append(req_amt[0])
+                app_time.append(req_amt[1])
+
+ 
+            else:
+                reqested_amt.append(req_amt[0])
+            
+        for y in reqested_amt:
+            if (y.find('<=') != -1):
+                amt_less.append(y)
+            if (y.find('>')!=-1):
+                amt_grt.append(y)
+        finalAmtGrtVal= len(amt_grt)
+    #print(finalAmtGrtVal)
+        finalAmtLessVal= len(amt_less)
+    
+        for i in app_time:
+            if (i.find('<=')!=-1):
+                time_less.append(i)
+            if(i.find('>')!=-1):
+                time_grt.append(i)
+
+        finalTimeGrtVal= len(time_grt)
     #print(finalTimeGrtVal)
-    finalTimeLessVal= len(time_less)
+        finalTimeLessVal= len(time_less)
     #print(finalTimeLessVal)
     
-    sumoftotal = finalAmtGrtVal+finalAmtLessVal+finalTimeGrtVal+finalTimeLessVal
+        # sumoftotal = finalAmtGrtVal+finalAmtLessVal+finalTimeGrtVal+finalTimeLessVal
     
-    per_amt_grt = round(((finalAmtGrtVal *100)/sumoftotal),2)
-    per_amt_less = round(((finalAmtLessVal *100)/sumoftotal),2)
-    per_time_grt = round(((finalTimeGrtVal *100)/sumoftotal),2)
-    per_time_less = round(((finalTimeLessVal *100)/sumoftotal),2)
+        # per_amt_grt = round(((finalAmtGrtVal *100)/sumoftotal),2)
+        # per_amt_less = round(((finalAmtLessVal *100)/sumoftotal),2)
+        # per_time_grt = round(((finalTimeGrtVal *100)/sumoftotal),2)
+        # per_time_less = round(((finalTimeLessVal *100)/sumoftotal),2)
 
     # Risk Module Accuracy
-    riskCount = risk_table.count()
+    riskCount = risk_table.count() # 0 
     count = 0
     matchcount=0
     lstRiskAccu=[]
     lstRiskPre =[]
+    permatchcount =0
 
     riskAccu=  Risk_Table.objects.values('classification')
     riskPre= Risk_Table.objects.values('predict_class')
     riskaccuracy = (Risk_Table.objects.filter(classification='Fraud') | Risk_Table.objects.filter(classification='Not_Fraud')).count()
-    
-    for x in riskAccu:
-        lstRiskAccu.append(x)
-    for y in riskPre:
-        lstRiskPre.append(y)
-    for x in lstRiskAccu:
-        if x.get('classification').strip()== lstRiskPre[count].get('predict_class'):
-            matchcount+=1
-        count+=1
-    permatchcount= round(((matchcount*100)/count),2)
+    if not riskAccu:
+        print("No data in Classification Column in Risk Table")
+        pass
+    else :
+        
+        for x in riskAccu:
+            lstRiskAccu.append(x)
+        for y in riskPre:
+            lstRiskPre.append(y)
+        for x in lstRiskAccu:
+            if x.get('classification').strip()== lstRiskPre[count].get('predict_class'):
+                matchcount+=1
+            count+=1
+        permatchcount= round(((matchcount*100)/count),2)
     
     # End risk Module Accuracy
 
@@ -107,7 +123,8 @@ def dashboard(request):
     df_count= df.groupby('geoLocation').size().reset_index()
     df_count.columns = ('Country','Sub_Count')
 
-    df['percent'] = ((df_count['Sub_Count']/totalCount) * 100)
+    df['percent'] = round(((df_count['Sub_Count']/totalCount) * 100),2)
+    
        
     data = dict(
         type = 'choropleth',
@@ -144,18 +161,19 @@ def dashboard(request):
                 "critical_queryset":critical_queryset,
                 "monthlyapp":monthlyapp,
                 "jsondata":jsondata,
-                "finalAmtGrtVal":finalAmtGrtVal,
-                "finalAmtLessVal":finalAmtLessVal,
-                "finalTimeGrtVal":finalTimeGrtVal,
-                "finalTimeLessVal":finalTimeLessVal,
-                "per_amt_grt":per_amt_grt,
-                "per_amt_less":per_amt_less,
-                "per_time_grt":per_time_grt,
-                "per_time_less":per_time_less,
+                # Risk Indicators context value
+                "finalAmtGrtVal":finalAmtGrtVal, # RI - 3 , 4
+                "finalAmtLessVal":finalAmtLessVal, # RI - 1
+                "finalTimeGrtVal":finalTimeGrtVal, # RI -2 
+                "finalTimeLessVal":finalTimeLessVal, # RI - 5 , 6 
+                # "per_amt_grt":per_amt_grt,
+                # "per_amt_less":per_amt_less,
+                # "per_time_grt":per_time_grt,
+                # "per_time_less":per_time_less,
                 "riskaccuracy":riskaccuracy,
                 "permatchcount": permatchcount,
                 "pending_pre_fraud":pending_pre_fraud,
                 "Pending_Pre_Not_Fraud":Pending_Pre_Not_Fraud,         
         }
-    print(per_amt_less)
+    
     return render(request,"ml_fraudulent_app/dashboard.html",context)
