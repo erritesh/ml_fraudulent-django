@@ -117,6 +117,7 @@ def dashboard(request):
 
     # month wise applicant data 
     monthlyapp = Applicant_Details.objects.annotate(month=ExtractMonth('app_submission_time')).values('month').annotate(c=Count('app_id')).order_by('month')
+    
     # For map
     totalCount = Applicant_Details.objects.all().count()
     df = read_frame(applicant_details)
@@ -124,8 +125,7 @@ def dashboard(request):
     df_count.columns = ('Country','Sub_Count')
 
     df['percent'] = round(((df_count['Sub_Count']/totalCount) * 100),2)
-    
-       
+     
     data = dict(
         type = 'choropleth',
         colorscale = 'jet',
@@ -175,5 +175,4 @@ def dashboard(request):
                 "pending_pre_fraud":pending_pre_fraud,
                 "Pending_Pre_Not_Fraud":Pending_Pre_Not_Fraud,         
         }
-    
     return render(request,"ml_fraudulent_app/dashboard.html",context)

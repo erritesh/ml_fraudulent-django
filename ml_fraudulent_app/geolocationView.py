@@ -57,4 +57,4 @@ def geolocationView(request):
     reader.close()
     #messages.add_message(request,messages.INFO,'Geolocation has been updated successfully!')
     #return HttpResponse (messages.add_message(request,messages.INFO,'Geolocation has been updated successfully!'))
-    return HttpResponse("Script Runned")       
+    return HttpResponse("Geo Localtion Script Runned successfully ")       

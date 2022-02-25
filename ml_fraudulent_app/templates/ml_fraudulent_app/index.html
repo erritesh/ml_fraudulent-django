@@ -120,16 +120,20 @@ thead input {
         <div class="col">
              
 {% comment %} <button class="btn btn-outline-dark" type="submit" onclick="location.href='{% url 'evaluate' %}'" name='evaluate'>Re-evaluate</button> {% endcomment %}
-<button class="btn btn-outline-dark" a href="javascript:void(0)" data-id="evaluate" onclick="reevaluate()">  Re-evaluate</a></button>
+<button class="btn btn-outline-dark" a href="javascript:void(0)" data-id="evaluate" id="reevaluate"> Re-evaluate</a></button>
 
+        {% comment %}<button type="button" href="{% url 'reset_applicant' %}" class="btn btn-outline-dark">Reset</button> 
 
-        {% comment %}<button type="button" href="{% url 'reset_applicant' %}" class="btn btn-outline-dark">Reset</button> {% endcomment %}
-        <input type="button" class="btn btn-outline-dark" id='script' name="scriptbutton" value=" Reset " onclick="goPython()">
+        <input type="button" class="btn btn-outline-dark" id='resetScript' name="scriptbutton" value=" Reset " onclick="goPython()"> {% endcomment %}
+        <input type="button" class="btn btn-outline-dark" id='resetScript' name="scriptbutton" value=" Reset ">
+        
           </div>
           <div class="col-md-auto">
-            <button class="btn btn-outline-dark" a href="javascript:void(0)" data-id="geolocation" onclick="geolocationPython()"> Geolocation Update</a></button>
+            <button class="btn btn-outline-dark" a href="javascript:void(0)" data-id="geolocation" id="geolocation"> Geolocation Update</a></button>
         </div>  
         </div> 
+      <img src="{%static 'ml_fraudulent_app/adminlte/dist/images/30.gif' %}" id="img" alt="loading" style="display:none">
+
   <hr class="mb-3"/>
     <table class="table table-hover" id="usersData" style="width:100%">
 
@@ -497,17 +501,35 @@ thead input {
             })  
           }
 
+      $('#resetScript').click(function(){
+        $('#img').show(); //<----here
+        $.ajax({
+        url: "/output",
+        context: document.body,
+         success:function(result){
+          alert("Table has been updated successfully");
+             $('#img').hide();  //<--- hide again
+             
+            
+         }
+         
+      });
+    });
+         
 
 
-    function goPython(){
+
+      /*    
+     function goPython(){
         $.ajax({
          url: "/output",
          context: document.body
         }).done(function() {
-         alert('finished Reset python script');;
+         alert('finished Reset python script');
         });
-    }
-    {% comment %} function getpage()
+    } 
+   */
+    /* function getpage()
     {
         $.ajax({
             url: "/pageview",
@@ -515,8 +537,8 @@ thead input {
            }).done(function() {
             alert('Page selected');
            });
-    }  {% endcomment %}
-  
+    }  */
+  /*
     function geolocationPython(){
         $.ajax({
          url: "/geolocationView",
@@ -525,6 +547,8 @@ thead input {
          alert('Geolocation has been updated successfully !');
         });
     }
+    */
+  /*  
 function reevaluate(){
   $.ajax({
     url: "/evaluate",
@@ -533,14 +557,37 @@ function reevaluate(){
     alert('ML scripts has been completed successfully !');
    });
 }
+*/
 
+$('#geolocation').click(function(){
+  $('#img').show(); //<----here
+  $.ajax({
+  url: "/geolocationView",
+  context: document.body,
+   success:function(result){
+       $('#img').hide();  //<--- hide again
+      console.log(result);
+   }
+});
+});
+
+
+$('#reevaluate').click(function(){
+  $('#img').show(); //<----here
+        $.ajax({
+        url: "/evaluate",
+        context: document.body,
+         success:function(result){
+             $('#img').hide();  //<--- hide again
+            console.log(result);
+         }
+      });
+  });
 /* Data Table Function */
 
 
 $(document).ready(function () {
             $('#usersData').DataTable({
-              
-
             "sDom": "lfrti",
             
             bPaginate: false,

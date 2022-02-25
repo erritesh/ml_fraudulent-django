@@ -168,5 +168,5 @@ def evaluateViews(request):
     #return HttpResponseRedirect(request.GET.get('next'))
 
     #return redirect('')
-    return HttpResponse("Script Runned")
+    return HttpResponse("ML Script Runned successfully")
     #return render(request, "ml_fraudulent_app/index.html")

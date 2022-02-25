@@ -195,6 +195,7 @@ def output(request):
         connection.commit()
         print(cursor.rowcount, "Record inserted successfully into Applicant Details table from Input Table")
         cursor.close()
+        #messages.success(request, 'Table has been reseted...')
 
     except mysql.connector.Error as error:
         print("Failed to delete record from table: {}".format(error))
@@ -203,4 +204,4 @@ def output(request):
             cursor.close()
             connection.close()
             print("MySQL connection is closed")
-            return HttpResponse("Script Runned")
+            return HttpResponse("Reset Script Successfully Runned")
