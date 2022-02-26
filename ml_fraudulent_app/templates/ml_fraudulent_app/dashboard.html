@@ -439,7 +439,7 @@ var ctx = document.getElementById("riskAccuracy").getContext("2d")
     
       type:"scatter",
       data:{ 
-          labels: [{{ riskaccuracy }}], // x- axis 
+          labels: [{{ pending_query_set }}], // x- axis 
           datasets: [
           {
               data: [{{ permatchcount }}],   // Y - axis

@@ -97,7 +97,7 @@ def dashboard(request):
 
     riskAccu=  Risk_Table.objects.values('classification')
     riskPre= Risk_Table.objects.values('predict_class')
-    riskaccuracy = (Risk_Table.objects.filter(classification='Fraud') | Risk_Table.objects.filter(classification='Not_Fraud')).count()
+    #riskaccuracy = (Risk_Table.objects.filter(classification='Fraud') | Risk_Table.objects.filter(classification='Not_Fraud')).count()
     if not riskAccu:
         print("No data in Classification Column in Risk Table")
         pass
@@ -170,7 +170,7 @@ def dashboard(request):
                 # "per_amt_less":per_amt_less,
                 # "per_time_grt":per_time_grt,
                 # "per_time_less":per_time_less,
-                "riskaccuracy":riskaccuracy,
+                #"riskaccuracy":riskaccuracy,
                 "permatchcount": permatchcount,
                 "pending_pre_fraud":pending_pre_fraud,
                 "Pending_Pre_Not_Fraud":Pending_Pre_Not_Fraud,         

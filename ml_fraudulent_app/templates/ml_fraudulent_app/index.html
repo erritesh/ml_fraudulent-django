@@ -345,10 +345,26 @@ thead input {
                         <input type="number" class="form-control" id="renter" name="renter" placeholder="Enter Renter" value="{{app.renter}}" required="">
                     </div>
                     <div class="col">
-                        <input type="text" class="form-control" id="unit_type" name="unit_type" placeholder="Enter Unit Type" value="{{app.unit_type}}" required="">
+                      <select class="custom-select" id="unit_type" name="unit_type">
+                        {% if app.unit_type != '' %}
+                        <option value="{{app.unit_type}}">{{app.unit_type}}</option>
+                        <option value="Single-Family">Single-Family</option>
+                        <option value="Multi-Family">Multi-Family</option>
+                        
+                        {% else %}
+                        <option value="">Select Category</option>
+                        <option value="Single-Family">Single-Family</option>
+                        <option value="Multi-Family">Multi-Family</option>
+                        {% endif %}
+                    </select>
                     </div>
                     <div class="col">
-                        <input type="text" class="form-control" id="requested_amount" name="requested_amount" placeholder="Enter Requested Amount" value="{{app.requested_amount}}" required>
+                        <div class="input-group mb-3">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text">$</span>
+                          </div>
+                          <input type="number" class="form-control" id="requested_amount" name="requested_amount" value="{{app.requested_amount}}" aria-label="requested_amount">
+                        </div>
                     </div>
                   </div>
                 </div>
@@ -366,7 +382,7 @@ thead input {
                         <input type="text" class="form-control" id="origin_ip" name="origin_ip" value="{{app.origin_ip}}">
                     </div>
                     <div class="col">
-                        <input type="text" class="form-control" id="geoLocation" name="geoLocation" placeholder="Enter Geo Location" value="{{app.geoLocation}}" required>
+                        <input type="text" class="form-control" id="geoLocation" name="geoLocation" placeholder="Geo-Location not found" value="{{app.geoLocation}}" required>
                     </div>
                   </div>
                 </div>
@@ -438,8 +454,6 @@ thead input {
                              <ul class="list-group">
                                     <li class="list-group-item disabled" aria-disabled="true">{{ rsk }}</li><br>
                                   </ul> 
-                                 
-                                
                                 </div>
                               
                              {% endfor %}
