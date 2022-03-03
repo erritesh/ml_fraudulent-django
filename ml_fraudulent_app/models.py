@@ -1,5 +1,8 @@
+from email.policy import default
+from pyexpat import model
 from django.db import connections
 from django.db import models
+from sqlalchemy import null
 #from decimal import Decimal
 
 
@@ -28,16 +31,16 @@ class Applicant_Details(models.Model):
     # requested_amount = models.DecimalField(
     #                      max_digits = 10,
     #                      decimal_places = 2)
-    requested_amount = models.IntegerField(blank=True, null=True)
+    requested_amount = models.DecimalField(max_digits = 10,
+                          decimal_places = 2,default=0)
     origin_ip = models.CharField(max_length=18)
     classification = models.CharField(max_length=20)
     #classification = models.PositiveSmallIntegerField(choices=CATEGORY_TYPES)
     
     geoLocation = models.CharField(max_length=30, null=True, blank=True, default='Null')
-
+    edited= models.BooleanField(default=0)
     #def __str__(self):
     #    return "%s %s" % (self.app_id, self.applicant_name)
-
 
 class Risk_Table(models.Model):
     #app_id = models.AutoField(primary_key=True)
@@ -45,8 +48,8 @@ class Risk_Table(models.Model):
     classification = models.CharField(max_length=50)
     predict_class = models.CharField(max_length=50)
     Risk_Score =models.DecimalField(
-                          max_digits = 3,
-                          decimal_places = 2)
+                          max_digits = 5,
+                          decimal_places = 1,default=0)
     Decision_Criteria = models.CharField(max_length=1000)
 
     # class Meta:
@@ -71,7 +74,7 @@ class Input_Table(models.Model):
     unit_type = models.CharField(max_length=100)
     requested_amount = models.DecimalField(
                          max_digits = 10,
-                         decimal_places = 2)
+                         decimal_places = 2,default=0)
     origin_ip = models.CharField(max_length=20)
     classification = models.CharField(max_length=30)
     
@@ -79,3 +82,13 @@ class Input_Table(models.Model):
 
     def __str__(self):
         return "%s %s" % (self.app_id, self.applicant_name)
+
+class Importance_rank_table(models.Model):
+    ImportanceID = models.AutoField(primary_key=True, 
+                                    null=False,blank=False)
+    Decision_Criteria = models.CharField(max_length=1000)                    
+    Importance = models.IntegerField(default=0)
+    
+    def __str__(self):
+        return "%s %s" % (self.Importance_id, self.Decision_Criteria)
+    

@@ -16,7 +16,7 @@ def dashboard(request):
 
     total_query_set = Applicant_Details.objects.all().count()
     fraud_query_set = Applicant_Details.objects.filter(classification='Fraud').count()
-    nonFraud_query_set = Applicant_Details.objects.filter(classification='Not_Fraud').count()
+    nonFraud_query_set = Applicant_Details.objects.filter(classification='Legitimate').count()
     pending_query_set = Applicant_Details.objects.filter(classification='').count()
     # Risk score count
     low_queryset = Risk_Table.objects.filter(Risk_Score__range=(0,25)).count()
@@ -26,8 +26,8 @@ def dashboard(request):
 
     Pending_Predicted_Fraud = Risk_Table.objects.filter(classification='') & Risk_Table.objects.filter(predict_class='Fraud')
     pending_pre_fraud= Pending_Predicted_Fraud.count()
-    Pending_Predicted_Not_Fraud = Risk_Table.objects.filter(classification='') & Risk_Table.objects.filter(predict_class='Not_Fraud')
-    Pending_Pre_Not_Fraud = Pending_Predicted_Not_Fraud.count()
+    Pending_Predicted_Legitimate = Risk_Table.objects.filter(classification='') & Risk_Table.objects.filter(predict_class='Legitimate')
+    Pending_Pre_Not_Fraud = Pending_Predicted_Legitimate.count()
 
     # Risk Indicator
     reqested_amt =[]
@@ -97,7 +97,7 @@ def dashboard(request):
 
     riskAccu=  Risk_Table.objects.values('classification')
     riskPre= Risk_Table.objects.values('predict_class')
-    #riskaccuracy = (Risk_Table.objects.filter(classification='Fraud') | Risk_Table.objects.filter(classification='Not_Fraud')).count()
+    #riskaccuracy = (Risk_Table.objects.filter(classification='Fraud') | Risk_Table.objects.filter(classification='Legitimate')).count()
     if not riskAccu:
         print("No data in Classification Column in Risk Table")
         pass

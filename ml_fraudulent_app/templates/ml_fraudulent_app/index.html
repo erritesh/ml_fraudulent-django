@@ -132,7 +132,10 @@ thead input {
             <button class="btn btn-outline-dark" a href="javascript:void(0)" data-id="geolocation" id="geolocation"> Geolocation Update</a></button>
         </div>  
         </div> 
-      <img src="{%static 'ml_fraudulent_app/adminlte/dist/images/30.gif' %}" id="img" alt="loading" style="display:none">
+        <div class="text-center">
+          <img src="{%static 'ml_fraudulent_app/adminlte/dist/images/30.gif' %}" id="img" alt="loading" style="display:none">
+        </div>
+      
 
   <hr class="mb-3"/>
     <table class="table table-hover" id="usersData" style="width:100%">
@@ -180,7 +183,7 @@ thead input {
                   </div> 
                   {% elif app.risk_table__Risk_Score <= 50 %} 
                   <div class="progress progress-xs">
-                    <div class="progress-bar bg-info" style="width: 50%"></div>
+                    <div class="progress-bar bg-info" style="width: 50%;background-color:#FDDA0D !important;"></div>
                   </div>
                   {% elif app.risk_table__Risk_Score <= 75 %}
                   <div class="progress progress-xs">
@@ -403,12 +406,12 @@ thead input {
                             <option value="{{app.classification}}">{{app.classification}}</option>
                             
                             <option value="Fraud">Fraud</option>
-                            <option value="Not_Fraud">Not Fraud</option>
+                            <option value="Legitimate">Legitimate</option>
                             
                             {% else %}
                             <option value="">Select Category</option>
                             <option value="Fraud">Fraud</option>
-                            <option value="Not_Fraud">Not Fraud</option>
+                            <option value="Legitimate">Legitimate</option>
                             {% endif %}
                         </select>  
                     </div>
@@ -459,7 +462,7 @@ thead input {
                              {% endfor %}
                              {% else %}
                              <div class="list-group-item disabled" aria-disabled="true" role="alert">
-                              Decision crireria not found !
+                              Decision Criteria Not Found !
                             </div>
                              
                              {% endif%}
@@ -473,7 +476,6 @@ thead input {
                     </button>
                     </div>
             </form>
-   
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -516,15 +518,13 @@ thead input {
           }
 
       $('#resetScript').click(function(){
-        $('#img').show(); //<----here
+        $('#img').show(); 
         $.ajax({
         url: "/output",
         context: document.body,
          success:function(result){
           alert("Table has been updated successfully");
-             $('#img').hide();  //<--- hide again
-             
-            
+             $('#img').hide();  
          }
          
       });
@@ -574,12 +574,12 @@ function reevaluate(){
 */
 
 $('#geolocation').click(function(){
-  $('#img').show(); //<----here
+  $('#img').show(); 
   $.ajax({
   url: "/geolocationView",
   context: document.body,
    success:function(result){
-       $('#img').hide();  //<--- hide again
+       $('#img').hide(); 
       console.log(result);
    }
 });
@@ -587,15 +587,25 @@ $('#geolocation').click(function(){
 
 
 $('#reevaluate').click(function(){
-  $('#img').show(); //<----here
-        $.ajax({
-        url: "/evaluate",
-        context: document.body,
-         success:function(result){
-             $('#img').hide();  //<--- hide again
-            console.log(result);
-         }
-      });
+  var retVal = confirm("The ML Script takes several minutes to execute do you want to continue ?");
+               if( retVal == true ) {
+                $('#img').show();
+                $.ajax({
+                  url: "/evaluate",
+                  context: document.body,
+                   success:function(result){
+                       $('#img').hide(); 
+                      console.log(result);
+                      alert("Table has been updated successfully");
+                   }
+                });
+
+                  return true;
+               } else {
+                  
+                  return false;
+               }
+        
   });
 /* Data Table Function */
 

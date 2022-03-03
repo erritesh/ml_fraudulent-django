@@ -32,7 +32,9 @@ from rest_framework.decorators import api_view
 from django.core.paginator import Paginator,EmptyPage, PageNotAnInteger
 import simplejson
 from django.http import Http404
-import pprint 
+from django.utils import timezone
+import pytz
+from django.db.models import Subquery, OuterRef
 
 
 
@@ -130,7 +132,9 @@ def ApplicantUpdate(request,app_id):
             geoLocation = request.POST.get('geoLocation')
             origin_ip = request.POST.get('origin_ip')
             classification =  request.POST.get('classification')
-            
+           
+
+            #classification = Applicant_Details.objects.values('risk_table__classification')
 
             applicant_details = Applicant_Details(
                 app_id = app_id,
@@ -146,14 +150,27 @@ def ApplicantUpdate(request,app_id):
                 requested_amount =requested_amount,
                 origin_ip= origin_ip,
                 geoLocation=geoLocation,
-                classification =classification,  
+                classification =classification,
             )
+            
+
+            risk = Risk_Table(
+                app_id = app_id,
+                classification =classification,
+            )
+            
+            print ("classification here")
+            #fillClassification = Applicant_Details.objects.filter(classification=OuterRef('app_id')).values_list('classification')[:1]
+            #Risk_Table.objects.update(classification=Subquery(fillClassification))
+            
+
+
 
     except Applicant_Details.DoesNotExist:
         raise Http404('Applicant Details does not exist')
     
-
     applicant_details.save()
+    risk.save(update_fields=['classification'])
     messages.add_message(request,messages.INFO,'Data has been updated Successfully !')
 
     return redirect('home')

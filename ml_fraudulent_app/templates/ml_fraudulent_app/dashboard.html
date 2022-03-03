@@ -334,7 +334,7 @@ var ctx = document.getElementById("countDashboard").getContext("2d")
 var countDashboard = new Chart(ctx,{
     type:"pie",
     data:{
-        labels: ["Predicted Fraud", "Predicted Not Fraud"],
+        labels: ["Predicted Fraud", "Predicted Legitimate"],
         datasets: [
         {
             data: [{{ pending_pre_fraud }}, {{ Pending_Pre_Not_Fraud }}],
