@@ -24,9 +24,9 @@ def dashboard(request):
     high_queryset = Risk_Table.objects.filter(Risk_Score__range=(51,75)).count()
     critical_queryset = Risk_Table.objects.filter(Risk_Score__range=(76,100)).count()
 
-    Pending_Predicted_Fraud = Risk_Table.objects.filter(classification='') & Risk_Table.objects.filter(predict_class='Fraud')
+    Pending_Predicted_Fraud = Risk_Table.objects.filter(classification=None) & Risk_Table.objects.filter(predict_class='Fraud')
     pending_pre_fraud= Pending_Predicted_Fraud.count()
-    Pending_Predicted_Legitimate = Risk_Table.objects.filter(classification='') & Risk_Table.objects.filter(predict_class='Legitimate')
+    Pending_Predicted_Legitimate = Risk_Table.objects.filter(classification=None) & Risk_Table.objects.filter(predict_class='Legitimate')
     Pending_Pre_Not_Fraud = Pending_Predicted_Legitimate.count()
 
     # Risk Indicator
@@ -108,9 +108,12 @@ def dashboard(request):
         for y in riskPre:
             lstRiskPre.append(y)
         for x in lstRiskAccu:
-            if x.get('classification').strip()== lstRiskPre[count].get('predict_class'):
-                matchcount+=1
-            count+=1
+            if x.get('classification') is None:
+                pass
+            else:
+                if x.get('classification').strip()== lstRiskPre[count].get('predict_class'):
+                  matchcount+=1
+                count+=1
         permatchcount= round(((matchcount*100)/count),2)
     
     # End risk Module Accuracy

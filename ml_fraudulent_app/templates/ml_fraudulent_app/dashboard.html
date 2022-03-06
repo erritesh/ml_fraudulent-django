@@ -97,7 +97,7 @@
                                         <div>
                                           <progress min="0" max="{{ total_query_set }}" value="{{ fraud_query_set }}">
                                         </div>
-                                        <span> <b>Fraudulent</b></span>
+                                        <span> <b>Determined Fraudulent</b></span>
                                       </div>
                                       
                                     </div>
@@ -110,7 +110,7 @@
                                         <div>
                                           <progress min="0" max="{{ total_query_set }}" value="{{ nonFraud_query_set }}">
                                         </div>
-                                        <span><b>Non-Fraudulent</b></span>
+                                        <span><b>Determined Legitimate</b></span>
                                       </div>
                                     </div>
                                   </div>
@@ -121,6 +121,18 @@
                       </div>
                     </div>
                     </section>
+
+                    <div class="col-lg-12">
+                      <div class="card">
+                        <div class="card-header border-0">
+                          <h3 class="card-title">Geo-tagging Origin IP's</h3>
+                        </div>
+                        <div class="card-body table-responsive p-0">  
+                        <div id="map1"></div>
+                      </div>
+                      </div>
+                    </div>
+
                     <div class="content">
                       <div class="container-fluid">
                         <div class="row">
@@ -151,6 +163,18 @@
                           <div class="col-lg-6">
                             <font size="3">
                             <div class="card">
+                              <!--<div class="card-header border-0">
+                                <div class="d-flex justify-content-between">
+                                  <h3 class="card-title">Model Performance</h3>
+                                </div>
+                              </div> -->
+                              <div class="card-body">
+                                <div> 
+                                  <canvas id="riskAccuracy" width="450px" height="300px" 
+                                  aria-label="chart" role="img"></canvas>
+                                </div>
+                              </div>  
+
                               <div class="card-header border-0">
                                 <div class="d-flex justify-content-between">
                                   <h3 class="card-title">Risk Indicators</h3>
@@ -162,8 +186,8 @@
                                 <tr>
                                   <th>#</th>
                                   <th>Indicator</th>
-                                 <th>Risk Score</th>
-                                <th>CI</th>
+                                 <th>App Count</th>
+                                <th>%</th>
                               </tr>
                            </thead>
                     <tr>
@@ -247,28 +271,14 @@
                       </tbody>
                         </table>
                                 </div>
-                                <div class="card-body">
-                                  <div> 
-                                    <canvas id="riskAccuracy" width="450px" height="300px" 
-                                    aria-label="chart" role="img"></canvas>
-                                  </div>
-                                </div>  
+                                
                               </div>
                             </div>
                           </div>
                         </div>
                       </font>
                       </div>
-                      <div class="col-lg-12">
-                        <div class="card">
-                          <div class="card-header border-0">
-                            <h3 class="card-title">Geo-tagging Origin IP's</h3>
-                          </div>
-                          <div class="card-body table-responsive p-0">  
-                          <div id="map1"></div>
-                        </div>
-                        </div>
-                      </div>
+                      
                     </div>
                     
                     
@@ -320,7 +330,6 @@
                 text: 'Severity Stats',
                 position: 'bottom',
                 fontSize:25,
-
             },
             subtitle: {
               display: true,
@@ -417,7 +426,7 @@ var lineDashboard = new Chart(ctx,{
       plugins: {
         title: {
             display: true,
-            text: 'Mothly Applicant Submission Count',
+            text: 'Monthly Applicant Submission Count',
             position: 'bottom',
             fontSize:25,
         },
@@ -447,8 +456,8 @@ var ctx = document.getElementById("riskAccuracy").getContext("2d")
               pointHoverRadius: 15,
               label: "Count",
               backgroundColor: [
-                '#FFA500', // for critical red
-                '#FFA500', // for high orange
+                '#000000', // for critical red
+                '#000000', // for high orange
               ], 
           },
           ],
@@ -473,7 +482,7 @@ var ctx = document.getElementById("riskAccuracy").getContext("2d")
           plugins: {
             title: {
                 display: true,
-                text: 'Model Accuracy',
+                text: 'Model Performance',
                 position: 'bottom',
                 fontSize:25,
 
@@ -491,7 +500,7 @@ var ctx = document.getElementById("riskAccuracy").getContext("2d")
             max: 20000,
             title: {
               display: true,
-              text: 'Total Classified Records'
+              text: 'Total Pending Records'
             },
           },
           y: {
@@ -506,7 +515,7 @@ var ctx = document.getElementById("riskAccuracy").getContext("2d")
             max: 100,
             title: {
               display: true,
-              text: 'Correct Predictions %'
+              text: 'Model Accuracy'
             },
           },
         },
