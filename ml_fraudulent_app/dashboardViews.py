@@ -1,6 +1,7 @@
-from ml_fraudulent_app.models import Applicant_Details, Risk_Table, Input_Table
+from pkgutil import ImpImporter
+from ml_fraudulent_app.models import Applicant_Details, Risk_Table, Input_Table,Importance_rank_table
 from django.shortcuts import redirect, render
-from django.db.models.functions import ExtractMonth
+from django.db.models.functions import ExtractMonth,ExtractYear
 from django.db.models import Count
 from django_pandas.io import read_frame
 import pandas as pd
@@ -120,6 +121,11 @@ def dashboard(request):
 
     # month wise applicant data 
     monthlyapp = Applicant_Details.objects.annotate(month=ExtractMonth('app_submission_time')).values('month').annotate(c=Count('app_id')).order_by('month')
+    print (monthlyapp)
+
+    yearlyapp = Applicant_Details.objects.annotate(year=ExtractYear('app_submission_time')).values('year').annotate(c=Count('app_id')).order_by('year')
+    print("=======yearlyapp====")
+    print(yearlyapp)
     
     # For map
     totalCount = Applicant_Details.objects.all().count()
@@ -153,6 +159,9 @@ def dashboard(request):
     
     jsondata = json.dumps(choromap, cls=plotly.utils.PlotlyJSONEncoder)
 
+    # From Imporance Rank table 
+    importance_rank = Importance_rank_table.objects.all().values('ImportanceID','Decision_Criteria','Importance')
+
     context = {"applicant_details":applicant_details,
                 "total_query_set":total_query_set,
                 "fraud_query_set":fraud_query_set,
@@ -176,6 +185,8 @@ def dashboard(request):
                 #"riskaccuracy":riskaccuracy,
                 "permatchcount": permatchcount,
                 "pending_pre_fraud":pending_pre_fraud,
-                "Pending_Pre_Not_Fraud":Pending_Pre_Not_Fraud,         
+                "Pending_Pre_Not_Fraud":Pending_Pre_Not_Fraud,
+                "importance_rank":importance_rank,
+                "yearlyapp":yearlyapp,         
         }
     return render(request,"ml_fraudulent_app/dashboard.html",context)

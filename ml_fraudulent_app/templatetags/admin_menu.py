@@ -10,6 +10,7 @@ import re
 
 from django.urls import reverse
 import calendar
+import datetime
 
 class _Menu:
     parents = []
@@ -173,6 +174,14 @@ def in_category(things, category):
 @register.filter
 def month_name(month_number):
     return calendar.month_name[month_number]
+
+@register.filter
+def yearintwo(year):
+    convertedyear=str(year)
+    dateFormatted =convertedyear[len(convertedyear)//2:]
+    return dateFormatted
+
+
 
 @register.filter(name='split')
 def split(value, key):
