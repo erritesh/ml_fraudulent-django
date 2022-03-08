@@ -121,11 +121,10 @@ def dashboard(request):
 
     # month wise applicant data 
     monthlyapp = Applicant_Details.objects.annotate(month=ExtractMonth('app_submission_time')).values('month').annotate(c=Count('app_id')).order_by('month')
-    print (monthlyapp)
+    
 
     yearlyapp = Applicant_Details.objects.annotate(year=ExtractYear('app_submission_time')).values('year').annotate(c=Count('app_id')).order_by('year')
-    print("=======yearlyapp====")
-    print(yearlyapp)
+    
     
     # For map
     totalCount = Applicant_Details.objects.all().count()
@@ -155,7 +154,7 @@ def dashboard(request):
     
     choromap = go.Figure(data = [data],layout = layout)
     choromap.data[0].update(zmin=0, zmax=100,colorbar_len=0.80)
-    choromap.update_layout(width=950,height=600, margin={"r":10,"t":0,"l":20,"b":10})
+    choromap.update_layout(width=1050,height=600, margin={"r":0,"t":0,"l":20,"b":10})
     
     jsondata = json.dumps(choromap, cls=plotly.utils.PlotlyJSONEncoder)
 

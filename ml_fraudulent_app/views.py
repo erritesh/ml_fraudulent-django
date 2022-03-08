@@ -178,7 +178,7 @@ def ApplicantUpdate(request,app_id):
                 classification =classification,
             )
             
-            print ("classification here")
+            
             #fillClassification = Applicant_Details.objects.filter(classification=OuterRef('app_id')).values_list('classification')[:1]
             #Risk_Table.objects.update(classification=Subquery(fillClassification))
             

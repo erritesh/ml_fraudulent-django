@@ -21,5 +21,8 @@ urlpatterns = [
     #path('evaluateViews',evaluateViews.evaluateViews,name="evaluateViews"),
     #re_path(r'^pageview/$', views.pageview),
     path('evaluate',evaluateViews.evaluateViews,name="evaluate"),
-    #path('getpageno',views.getpageno,name="getpageno"),    
+    #path('getpageno',views.getpageno,name="getpageno"),
+    path('updategeo/<str:app_id>',geolocationView.singlegeoLocationupdateView,name="singlegeoLocationupdateView"),
+    
+
 ]

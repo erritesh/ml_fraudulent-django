@@ -22,9 +22,11 @@ thead input {
     margin-top: 1rem!important;
   }
   .list-group-item {
-    padding: 6px 10px
+    padding: 6px 10px;
 }
-  
+.nowrap{
+  white-space: nowrap;
+}
 </style>
 <div class="row mb-2">
     <div class="col-sm-4">
@@ -120,16 +122,16 @@ thead input {
         <div class="col">
              
 {% comment %} <button class="btn btn-outline-dark" type="submit" onclick="location.href='{% url 'evaluate' %}'" name='evaluate'>Re-evaluate</button> {% endcomment %}
-<button class="btn btn-outline-dark" a href="javascript:void(0)" data-id="evaluate" id="reevaluate"> Re-evaluate</a></button>
+<button class="btn btn-info" a href="javascript:void(0)" data-id="evaluate" id="reevaluate"> Re-evaluate</a></button>
 
         {% comment %}<button type="button" href="{% url 'reset_applicant' %}" class="btn btn-outline-dark">Reset</button> 
 
         <input type="button" class="btn btn-outline-dark" id='resetScript' name="scriptbutton" value=" Reset " onclick="goPython()"> {% endcomment %}
-        <input type="button" class="btn btn-outline-dark" id='resetScript' name="scriptbutton" value=" Reset ">
+        <input type="button" class="btn btn-info" id='resetScript' name="scriptbutton" value=" Reset ">
         
           </div>
           <div class="col-md-auto">
-            <button class="btn btn-outline-dark" a href="javascript:void(0)" data-id="geolocation" id="geolocation"> Geolocation Update</a></button>
+            <button class="btn btn-info" a href="javascript:void(0)" data-id="geolocation" id="geolocation"> Geolocation Update</a></button>
         </div>  
         </div> 
         <div class="text-center">
@@ -159,8 +161,8 @@ thead input {
             <th>Submission Time</th>
             <th>Applicant Name</th>
             <th>Requested Amount </th>
-            <th>Origin IP </th>
-            <th>Geolocation </th>
+            <!--<th>Origin IP </th>
+            <th>Geolocation </th> -->
             <th>Classification </th>
             <th>Risk Score </th>
             <th class="disableFilterBy" style="width:143px">Action</th>
@@ -174,9 +176,9 @@ thead input {
             <td>{{app.app_id}}</td> 
             <td>{{app.app_submission_time | date:"Y-m-d, H:m:s"}}</td>
             <td>{{app.applicant_name}}</td>
-            <td>{{app.requested_amount}} </td>
-            <td>{{app.origin_ip}}</td>
-            <td>{{app.geoLocation}}</td>
+            <td>${{app.requested_amount}} </td>
+            <!--<td>{{app.origin_ip}}</td>
+            <td>{{app.geoLocation}}</td> -->
             <td>{{app.classification}}</td>
             <td>{{app.risk_table__Risk_Score}}
                 {% if app.risk_table__Risk_Score <= 25 %}
@@ -202,10 +204,19 @@ thead input {
                   {% endif %}
                 </td>
                 <td> 
-                <a href="#editApplicantModal-{{forloop.counter}}" class="btn btn-info btn-sm" data-toggle="modal"><i class="fas fa-user-edit"></i>Review</a>
+                  <span class="nowrap">
+                <form action="/updategeo/{{app.app_id}}" id="geolocupdate" name="geolocupdate" class="form-horizontal" method="POST">
+                  {% csrf_token %}
+                  <a href="#editApplicantModal-{{forloop.counter}}" class="btn btn-info btn-sm" data-toggle="modal"><i class="fas fa-user-edit"></i>Review</a>
+
+                  <button type="submit" class="btn" id="btn-geoupdate" name= "geoupdate"><i class="fas fa-sync-alt"></i>
+
+                  </button>
+                </form>
+              </span>
+              </td>
+                
                  
-                <button class="btn" a href="javascript:void(0)" data-id="#" onclick="#"> <i class="fas fa-sync-alt"></i></a></button>
-                 </td>
           </tr>
           {% empty %}
             <tr><td colspan="5">Currently no Data Available</td></tr>
@@ -387,7 +398,7 @@ thead input {
                         <input type="text" class="form-control" id="origin_ip" name="origin_ip" value="{{app.origin_ip}}">
                     </div>
                     <div class="col">
-                        <input type="text" class="form-control" id="geoLocation" name="geoLocation" placeholder="Geo-Location not found" value="{{app.geoLocation}}" required>
+                        <input type="text" class="form-control" id="geoLocation" name="geoLocation" placeholder="Geo-Location not found" value="{{app.geoLocation}}">
                     </div>
                   </div>
                 </div>
@@ -586,6 +597,20 @@ $('#geolocation').click(function(){
    }
 });
 });
+
+/* single Geo localtion update*/
+$('#singlegeoupdate').click(function(){
+  $('#img').show(); 
+  $.ajax({
+  url: "/singlegeoLocationupdateView",
+  context: document.body,
+   success:function(result){
+       $('#img').hide(); 
+      console.log(result);
+   }
+});
+});
+
 
 
 $('#reevaluate').click(function(){
