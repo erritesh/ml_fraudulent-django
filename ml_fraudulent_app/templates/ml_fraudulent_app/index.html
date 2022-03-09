@@ -49,7 +49,16 @@ thead input {
 <section class="content">
     <div class="container-fluid">
       <!-- Small boxes (Stat box) -->
-      <div class="row">
+      <div class="col-lg-12">
+        <div class="card" style="margin-right: -8.5px; margin-left: -8.5px;" >
+          <div class="card-header border-0">
+            <h3 class="card-title">
+              Predicted risk disposition of pending applications
+              </h3>
+          </div>
+          <div class="card-body table-responsive p-0"> 
+          <div class="row" style="margin-right: 0.5px; margin-left: 0.5px;">
+
 
       <!-- ./col -->
 <div class="col-lg-3 col-2">
@@ -114,6 +123,10 @@ thead input {
 </div>
 </div>
 </div>
+</div>
+</div>
+</div>
+
 </section>
 
 <!-- Boxes code end here-->
@@ -123,15 +136,10 @@ thead input {
              
 {% comment %} <button class="btn btn-outline-dark" type="submit" onclick="location.href='{% url 'evaluate' %}'" name='evaluate'>Re-evaluate</button> {% endcomment %}
 <button class="btn btn-info" a href="javascript:void(0)" data-id="evaluate" id="reevaluate"> Re-evaluate</a></button>
-
-        {% comment %}<button type="button" href="{% url 'reset_applicant' %}" class="btn btn-outline-dark">Reset</button> 
-
-        <input type="button" class="btn btn-outline-dark" id='resetScript' name="scriptbutton" value=" Reset " onclick="goPython()"> {% endcomment %}
-        <input type="button" class="btn btn-info" id='resetScript' name="scriptbutton" value=" Reset ">
-        
           </div>
           <div class="col-md-auto">
-            <button class="btn btn-info" a href="javascript:void(0)" data-id="geolocation" id="geolocation"> Geolocation Update</a></button>
+            <input type="button" class="btn btn-info" id='resetScript' name="scriptbutton" value=" Reset ">
+
         </div>  
         </div> 
         <div class="text-center">
@@ -141,31 +149,21 @@ thead input {
 
   <hr class="mb-3"/>
     <table class="table table-hover" id="usersData" style="width:100%">
-
-      
-        {% comment %} <label>Show 
-          <select name="userstable_length" aria-controls="userstable" class="" onchange="showValue(this)" id="pageno">
-          <option value="10">10</option>
-          <option value="25">25</option>
-          <option value="50">50</option>
-          <option value="100">100</option>
-        </select> 
-        entries
-      </label> {% endcomment %}
-     
-
-
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Submission Time</th>
-            <th>Applicant Name</th>
-            <th>Requested Amount </th>
+            <th style="text-align:left">ID</th>
+            <th style="text-align:left">Submission Time</th>
+            <th style="text-align:left">Applicant Name</th>
+            <th style="text-align:left">Requested Amount</th>
+            <th style="text-align:left">Classification</th>
+            <th style="text-align:left">Risk Score</th>
+            <th style="text-align:center">Action</th>
+            
+          
             <!--<th>Origin IP </th>
-            <th>Geolocation </th> -->
-            <th>Classification </th>
-            <th>Risk Score </th>
-            <th class="disableFilterBy" style="width:143px">Action</th>
+            <th>Geolocation </th> 
+            
+            <th class="disableFilterBy" style="width:143px"></th> -->
           </tr>
         </thead>
         <tbody>  
@@ -204,27 +202,14 @@ thead input {
                   {% endif %}
                 </td>
                 <td> 
-                  <span class="nowrap">
-                <form action="/updategeo/{{app.app_id}}" id="geolocupdate" name="geolocupdate" class="form-horizontal" method="POST">
-                  {% csrf_token %}
-                  <a href="#editApplicantModal-{{forloop.counter}}" class="btn btn-info btn-sm" data-toggle="modal"><i class="fas fa-user-edit"></i>Review</a>
-
-                  <button type="submit" class="btn" id="btn-geoupdate" name= "geoupdate"><i class="fas fa-sync-alt"></i>
-
-                  </button>
-                </form>
-              </span>
-              </td>
-                
-                 
+                  <center><a href="#editApplicantModal-{{forloop.counter}}" class="btn btn-info btn-sm" data-toggle="modal"><i class="fas fa-user-edit"></i> &nbsp; Review</a></center>
+              </td>     
           </tr>
           {% empty %}
             <tr><td colspan="5">Currently no Data Available</td></tr>
           {% endfor %}
           {% endif %}
-        </tbody>
-       
-       
+        </tbody> 
     </table>
     <div>
       {% if applicant_list.has_other_pages %}

@@ -10,6 +10,7 @@ import plotly.graph_objs as go
 #from plotly.offline import iplot
 import json
 import plotly
+from django.db.models import Sum
 
 
 def dashboard(request):
@@ -56,11 +57,8 @@ def dashboard(request):
             if(len(req_amt)>1):
                 reqested_amt.append(req_amt[0])
                 app_time.append(req_amt[1])
-
- 
             else:
-                reqested_amt.append(req_amt[0])
-            
+                reqested_amt.append(req_amt[0]) 
         for y in reqested_amt:
             if (y.find('<=') != -1):
                 amt_less.append(y)
@@ -79,15 +77,7 @@ def dashboard(request):
         finalTimeGrtVal= len(time_grt)
     #print(finalTimeGrtVal)
         finalTimeLessVal= len(time_less)
-    #print(finalTimeLessVal)
     
-        # sumoftotal = finalAmtGrtVal+finalAmtLessVal+finalTimeGrtVal+finalTimeLessVal
-    
-        # per_amt_grt = round(((finalAmtGrtVal *100)/sumoftotal),2)
-        # per_amt_less = round(((finalAmtLessVal *100)/sumoftotal),2)
-        # per_time_grt = round(((finalTimeGrtVal *100)/sumoftotal),2)
-        # per_time_less = round(((finalTimeLessVal *100)/sumoftotal),2)
-
     # Risk Module Accuracy
     riskCount = risk_table.count() # 0 
     count = 0
@@ -115,17 +105,17 @@ def dashboard(request):
                 if x.get('classification').strip()== lstRiskPre[count].get('predict_class'):
                   matchcount+=1
                 count+=1
+        
         permatchcount= round(((matchcount*100)/count),2)
     
     # End risk Module Accuracy
 
     # month wise applicant data 
     monthlyapp = Applicant_Details.objects.annotate(month=ExtractMonth('app_submission_time')).values('month').annotate(c=Count('app_id')).order_by('month')
-    
+    print(type(monthlyapp))
 
     yearlyapp = Applicant_Details.objects.annotate(year=ExtractYear('app_submission_time')).values('year').annotate(c=Count('app_id')).order_by('year')
-    
-    
+
     # For map
     totalCount = Applicant_Details.objects.all().count()
     df = read_frame(applicant_details)
@@ -161,7 +151,18 @@ def dashboard(request):
     # From Imporance Rank table 
     importance_rank = Importance_rank_table.objects.all().values('ImportanceID','Decision_Criteria','Importance')
 
-    context = {"applicant_details":applicant_details,
+
+    fraud_ReqAmount = Applicant_Details.objects.filter(risk_table__predict_class='Fraud').values('requested_amount').aggregate(Sum('requested_amount'))
+    fraud_amount= fraud_ReqAmount.values()
+    print(type(fraud_amount))
+    #final_fraud_ReqAmount= int(float(fraud_ReqAmount))
+
+    legit_ReqAmount = Applicant_Details.objects.filter(risk_table__predict_class='Legitimate').values('requested_amount').aggregate(Sum('requested_amount'))
+    #finallegit_reqAmount= int(float(legit_ReqAmount))
+    
+
+    context = {
+                "applicant_details":applicant_details,
                 "total_query_set":total_query_set,
                 "fraud_query_set":fraud_query_set,
                 "nonFraud_query_set":nonFraud_query_set,

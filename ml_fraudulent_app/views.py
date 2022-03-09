@@ -151,6 +151,15 @@ def ApplicantUpdate(request,app_id):
             geoLocation = request.POST.get('geoLocation')
             origin_ip = request.POST.get('origin_ip')
             classification =  request.POST.get('classification')
+
+            reader = geoip2.database.Reader('ml_fraudulent_app/mmdb/GeoLite2-City.mmdb')
+            final_ip= origin_ip.replace('\r', '')
+            try:
+                response = reader.city(final_ip)
+                country_name= (response.country.name)
+                print('country.name:{}'.format(country_name))
+            except:
+                pass
            
 
             #classification = Applicant_Details.objects.values('risk_table__classification')
@@ -168,7 +177,7 @@ def ApplicantUpdate(request,app_id):
                 unit_type = unit_type,
                 requested_amount =requested_amount,
                 origin_ip= origin_ip,
-                geoLocation=geoLocation,
+                geoLocation=country_name,
                 classification =classification,
             )
             
@@ -179,8 +188,7 @@ def ApplicantUpdate(request,app_id):
             )
             
             
-            #fillClassification = Applicant_Details.objects.filter(classification=OuterRef('app_id')).values_list('classification')[:1]
-            #Risk_Table.objects.update(classification=Subquery(fillClassification))
+           
             
 
 

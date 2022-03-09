@@ -304,7 +304,7 @@
           plugins: {
             title: {
                 display: true,
-                text: 'Severity Stats',
+                text: 'Risk Stats',
                 position: 'bottom',
                 fontSize:25,
             },
@@ -326,9 +326,8 @@ var countDashboard = new Chart(ctx,{
             data: [{{ pending_pre_fraud }}, {{ Pending_Pre_Not_Fraud }}],
             label: "Count",
             backgroundColor: [
-              'rgb(30,129,176)', // for pending gray 
-              'rgb(135,62,35)', // for Fraudulent redsss
-             
+              '#dc3545',
+              '#28a745',
             ], 
         },
         ],
