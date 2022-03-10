@@ -86,8 +86,9 @@ class Input_Table(models.Model):
 class Importance_rank_table(models.Model):
     ImportanceID = models.AutoField(primary_key=True, 
                                     null=False,blank=False)
-    Decision_Criteria = models.CharField(max_length=1000)                    
-    Importance = models.IntegerField(default=0)
+    Decision_Criteria = models.CharField(max_length=1000) 
+    Count = models.IntegerField(default=0)                 
+    Importance = models.DecimalField(max_digits=3, decimal_places=2, default=0)
     
     def __str__(self):
         return "%s %s" % (self.Importance_id, self.Decision_Criteria)

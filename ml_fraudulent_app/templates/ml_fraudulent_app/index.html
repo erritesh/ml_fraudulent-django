@@ -58,8 +58,6 @@ thead input {
           </div>
           <div class="card-body table-responsive p-0"> 
           <div class="row" style="margin-right: 0.5px; margin-left: 0.5px;">
-
-
       <!-- ./col -->
 <div class="col-lg-3 col-2">
     <div class="small-box bg-success">
@@ -599,8 +597,6 @@ $('#singlegeoupdate').click(function(){
 
 
 $('#reevaluate').click(function(){
-  var retVal = confirm("The ML Script takes several minutes to execute do you want to continue ?");
-               if( retVal == true ) {
                 $('#img').show();
                 $.ajax({
                   url: "/evaluate",
@@ -610,14 +606,7 @@ $('#reevaluate').click(function(){
                       console.log(result);
                       alert("Table has been updated successfully");
                    }
-                });
-
-                  return true;
-               } else {
-                  
-                  return false;
-               }
-        
+                });     
   });
 /* Data Table Function */
 

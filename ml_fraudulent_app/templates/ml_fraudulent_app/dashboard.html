@@ -197,39 +197,28 @@
                               <td>{{importance_val.ImportanceID}}</td>
                               
                               <td>{{importance_val.Decision_Criteria}} </td>
-                              <td>
-                                <div>
-                                  {% if "Requested Amount > 50500.0" in importance_val.Decision_Criteria %}
-                                   {{ finalAmtGrtVal }}
-                                   {% elif "Requested Amount <= 50500.0" in importance_val.Decision_Criteria %}
-                                   {{ finalAmtLessVal }}
-                                   {% elif "Application Duration <= 60" in importance_val.Decision_Criteria %}
-                                   {{ finalTimeLessVal }}
-                                   {% elif "Application Duration > 60" in importance_val.Decision_Criteria %}
-                                   {{ finalTimeGrtVal }}
-                                  {% else %}
-                                  NO Data Found
-                                   {% endif %}
-                                   {% if importance_rank %} 
-                                   {% if importance_val.Importance >= 90  %}
-                                   <div class="progress progress-xs progress-striped active">
-                                    <div class="progress-bar bg-success" style="width: {{importance_val.Importance}}%" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
-                                    {% elif importance_val.Importance >= 70 %}
-                                    <div class="progress progress-xs progress-striped active">
-                                      <div class="progress-bar bg-warning" style="width: {{importance_val.Importance}}%" aria-valuemin="0" aria-valuemax="100"></div>
-                                      </div>
-                                      {% elif importance_val.Importance <= 69 %}
-                                      <div class="progress progress-xs progress-striped active">
-                                        <div class="progress-bar bg-danger" style="width: {{importance_val.Importance}}%" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                        {% else %}
-                                        <div class="progress progress-xs progress-striped active">
-                                          <div class="progress-bar bg-danger" style="width: {{importance_val.Importance}}%" aria-valuemin="0" aria-valuemax="100"></div>
-                                    {% endif %}
-                                    {% endif %}
-                                </div>
-                              </td>
+                              <td> {{importance_val.Count}} 
+                              <!-- Progress Bar Code  -->
+      {% if importance_rank %} 
+       {% if importance_val.Importance >= 90  %}
+       <div class="progress progress-xs progress-striped active">
+        <div class="progress-bar bg-success" style="width: {{importance_val.Importance}}%" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        {% elif importance_val.Importance >= 70 %}
+        <div class="progress progress-xs progress-striped active">
+          <div class="progress-bar bg-warning" style="width: {{importance_val.Importance}}%" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+          {% elif importance_val.Importance <= 69 %}
+          <div class="progress progress-xs progress-striped active">
+            <div class="progress-bar bg-danger" style="width: {{importance_val.Importance}}%" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            {% else %}
+            <div class="progress progress-xs progress-striped active">
+              <div class="progress-bar bg-danger" style="width: {{importance_val.Importance}}%" aria-valuemin="0" aria-valuemax="100"></div>
+        {% endif %}
+        {% endif %}
+      </td>
+                              
                               <td>
                                 {% if importance_rank %} 
                                    {% if importance_val.Importance >= 90  %}
@@ -487,7 +476,7 @@ var ctx = document.getElementById("riskAccuracy").getContext("2d")
           },
             display: true,
             beginAtZero: true,
-            max: 100,
+            max: 120,
             title: {
               display: true,
               text: 'Model Accuracy'

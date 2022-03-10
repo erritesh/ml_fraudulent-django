@@ -11,6 +11,8 @@ import plotly.graph_objs as go
 import json
 import plotly
 from django.db.models import Sum
+from django.db.models import F
+
 
 
 def dashboard(request):
@@ -86,9 +88,11 @@ def dashboard(request):
     lstRiskPre =[]
     permatchcount =0
 
+    #User.objects.filter(last_name=F("first_name"))
+
     riskAccu=  Risk_Table.objects.values('classification')
     riskPre= Risk_Table.objects.values('predict_class')
-    #riskaccuracy = (Risk_Table.objects.filter(classification='Fraud') | Risk_Table.objects.filter(classification='Legitimate')).count()
+
     if not riskAccu:
         print("No data in Classification Column in Risk Table")
         pass
@@ -100,14 +104,18 @@ def dashboard(request):
             lstRiskPre.append(y)
         for x in lstRiskAccu:
             if x.get('classification') is None:
+
                 pass
             else:
                 if x.get('classification').strip()== lstRiskPre[count].get('predict_class'):
                   matchcount+=1
-                count+=1
-        
-        permatchcount= round(((matchcount*100)/count),2)
+                count+=1 #8188
     
+    classification_val=  Risk_Table.objects.filter(classification__isnull=False).count()
+    finaltab= Risk_Table.objects.filter(classification=F('predict_class')).count()
+
+    permatchcount= round(((finaltab*100)/classification_val),2)
+        
     # End risk Module Accuracy
 
     # month wise applicant data 
@@ -149,7 +157,7 @@ def dashboard(request):
     jsondata = json.dumps(choromap, cls=plotly.utils.PlotlyJSONEncoder)
 
     # From Imporance Rank table 
-    importance_rank = Importance_rank_table.objects.all().values('ImportanceID','Decision_Criteria','Importance')
+    importance_rank = Importance_rank_table.objects.all().values('ImportanceID','Decision_Criteria','Importance','Count')
 
 
     fraud_ReqAmount = Applicant_Details.objects.filter(risk_table__predict_class='Fraud').values('requested_amount').aggregate(Sum('requested_amount'))
