@@ -1,3 +1,4 @@
+from ast import Continue
 from gettext import find
 from django.http.response import HttpResponse
 from django.shortcuts import redirect, render
@@ -55,6 +56,7 @@ from sklearn.model_selection import GridSearchCV
 # Import scikit-learn metrics module for accuracy calculation
 from sklearn.metrics import accuracy_score
 from .evaluateViews import evaluateViews
+from django.http import HttpResponseRedirect
 
 
 
@@ -75,7 +77,7 @@ def home(request):
     mediumCount = medium_queryset.count()
     highCount = high_queryset.count()
     criticalCount = critical_queryset.count()
-    print(criticalCount)
+    
       
     #applicant_details = Applicant_Details.objects.get_queryset().order_by('app_id')
 
@@ -107,14 +109,26 @@ def home(request):
     #dict= {[{user_id: {}},{userid2:{}}]}
     #newvar= {user_id: risk_score}
     
+    noneClassification_list= Applicant_Details.objects.filter(classification='').values('app_email', 'app_id', 'app_mailing', 'app_onphone', 'app_ssn', 'app_start_time', 'app_submission_time', 'applicant_name', 'classification', 'geoLocation', 'origin_ip', 'renter', 'requested_amount', 'unit_type','risk_table__Decision_Criteria','risk_table__predict_class','risk_table__Risk_Score').order_by('app_id')
+    
+    page = request.GET.get('page', 1)
+    paginator = Paginator(noneClassification_list, 10)
 
+    try:
+        noneClassification = paginator.page(page)
+    except PageNotAnInteger:
+        noneClassification = paginator.page(1)
+    except EmptyPage:
+       noneClassification = paginator.page(paginator.num_pages)
+    
     context = { 
                 "total_query_set":total_query_set,
                 "low_query_set":lowCount,
                 "medium_query_set":mediumCount,
                 "high_query_set":highCount,
                 "critical_query_set":criticalCount,
-                "applicant_list":applicant_list,        
+                "applicant_list":applicant_list,
+                "noneClassification":noneClassification,       
     } 
     return render(request,"ml_fraudulent_app/index.html",context)
 
@@ -151,20 +165,27 @@ def ApplicantUpdate(request,app_id):
             renter =  request.POST.get('renter')
             unit_type =  request.POST.get('unit_type')
             requested_amount =  request.POST.get('requested_amount')
-            geoLocation = request.POST.get('geoLocation')
+            #geoLocation = request.POST.get('geoLocation')
             origin_ip = request.POST.get('origin_ip')
             classification =  request.POST.get('classification')
 
             reader = geoip2.database.Reader('ml_fraudulent_app/mmdb/GeoLite2-City.mmdb')
             final_ip= origin_ip.replace('\r', '')
+            country_name =''
             try:
                 response = reader.city(final_ip)
+            
                 country_name= (response.country.name)
-                print('country.name:{}'.format(country_name))
+                if country_name =='':
+                    country_name= ''
+
+                    print('country.name:{}'.format(country_name))
+                
+                else:
+                    country_name= (response.country.name)
             except:
                 pass
-           
-
+               
             #classification = Applicant_Details.objects.values('risk_table__classification')
 
             applicant_details = Applicant_Details(
@@ -189,15 +210,18 @@ def ApplicantUpdate(request,app_id):
                 app_id = app_id,
                 classification =classification,
             )
-            
+        
+        evaluateViews(request) 
     except Applicant_Details.DoesNotExist:
         raise Http404('Applicant Details does not exist')
+
     
     applicant_details.save()
     risk.save(update_fields=['classification'])
     messages.add_message(request,messages.INFO,'Data has been updated Successfully !')
 
     return redirect('home')
+    #return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     #return redirect("ml_fraudulent_app/index.html")
 
 def logout(request):

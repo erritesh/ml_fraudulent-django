@@ -1,0 +1,741 @@
+{% extends "ml_fraudulent_app/admin/base_site.html" %}
+{% load i18n static %}
+{% load admin_menu %}
+
+{% block extrastyle %}
+{{ block.super }}
+<!-- <link rel="stylesheet" type="text/css" href="{% static 'admin/css/dashboard.css' %}" /> -->
+{% endblock %}
+{{ value|date:"Y-m-d H:m:s" }}
+
+{% block coltype %}colMS{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+{% if not is_popup %}
+{% block breadcrumbs %}
+<link rel="stylesheet" type="text/css" href="{% static 'ml_fraudulent_app/admin/css/custom.css' %}" />
+<style>
+thead input {
+    width: 100%!important;
+  }
+.card {
+    margin-top: 1rem!important;
+  }
+  .list-group-item {
+    padding: 6px 10px;
+}
+.nowrap{
+  white-space: nowrap;
+}
+</style>
+<div class="row mb-2">
+    <div class="col-sm-4">
+        <h2>{{title}}</h2>
+    </div>
+    <div class="col-sm-8">
+        <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="#"><i class="fas fa-tachometer-alt"></i> {% trans 'Home' %}</a></li>
+            {% for app in app_list %}
+            <li class="breadcrumb-item active">{{ app.name }}</li>
+            {% endfor %}
+        </ol>
+    </div>
+</div>
+{% endblock %}
+{% endif %}
+
+<!-- main Code start Here -->
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+      <!-- Small boxes (Stat box) -->
+      <div class="col-lg-12">
+        <div class="card" style="margin-right: -8.5px; margin-left: -8.5px;" >
+          <div class="card-header border-0">
+            <h3 class="card-title">
+              Predicted risk disposition of pending applications
+              </h3>
+          </div>
+          <div class="card-body table-responsive p-0"> 
+          <div class="row" style="margin-right: 0.5px; margin-left: 0.5px;">
+      <!-- ./col -->
+<div class="col-lg-3 col-2">
+    <div class="small-box bg-success">
+        <div class="inner">
+            <h3>{{ low_query_set }}<sup style="font-size: 20px"></sup></h3>
+            <div>
+            <progress value="{{ low_query_set }}" max="{{ total_query_set }}"> </progress>
+            </div>
+                <span><b>Low Risk</b></span>
+            </div>
+            <div class="icon">
+                <i class="far fa-bookmark"></i>  
+        </div>
+    </div>
+</div>
+ <!-- ./col -->
+<div class="col-lg-3 col-2">
+    <!-- small box -->
+    <div class="small-box bg-light">
+      <div class="inner">
+        <h3 style="color:#ffffff;">{{ medium_query_set }}</h3>
+        <div>
+        <progress value="{{ medium_query_set }}" max="{{ total_query_set }}"> </progress>
+        </div>
+            <span style="color:#ffffff;"><b>Medium Risk</b></span>
+      </div>
+            <div class="icon">
+                <i class="far fa-bell"></i>
+            </div>
+    </div>
+</div>
+
+<div class="col-lg-3 col-2">
+    <div class="small-box bg-white"> 
+        <div class="inner">
+            <h3 style="color:#ffffff;">{{ high_query_set }}<sup style="font-size: 20px"></sup></h3>
+           <div>
+           <progress value="{{ high_query_set }}" max="{{ total_query_set }}"> </progress>
+           </div>
+             <span style="color:#ffffff;"><b>High Risk</b></span>
+            </div>
+            <div class="icon">
+                <i class="fas fa-biohazard"></i>    
+        </div>
+    </div>
+</div>
+
+<div class="col-lg-3 col-2">
+    <div class="small-box bg-danger">
+        <div class="inner">
+            <h3>{{ critical_query_set }}<sup style="font-size: 20px"></sup></h3>
+            <div>
+            <progress value="{{ critical_query_set }}" max="{{ total_query_set }}"> </progress>
+            </div>
+                <span><b>Critical Risk</b></span>
+            </div>
+            <div class="icon">       
+                <i class="fas fa-exclamation-triangle"></i>  
+        </div>
+    </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</section>
+
+<!-- Boxes code end here-->
+<div class="container">
+    <div class="row">
+        <div class="col">
+             
+{% comment %} <button class="btn btn-outline-dark" type="submit" onclick="location.href='{% url 'evaluate' %}'" name='evaluate'>Re-evaluate</button> {% endcomment %}
+<button class="btn btn-info" a href="javascript:void(0)" data-id="evaluate" id="reevaluate"> Re-evaluate</a></button>
+          </div>
+          <div class="col-md-auto">
+            <input type="button" class="btn btn-info" id='resetScript' name="scriptbutton" value=" Reset ">
+
+        </div>  
+        </div> 
+        <div class="text-center">
+          <img src="{%static 'ml_fraudulent_app/adminlte/dist/images/30.gif' %}" id="img" alt="loading" style="display:none">
+        </div>
+      
+
+  <hr class="mb-3"/>
+  <div>
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="active">
+            <a href="#tab-table1" data-toggle="tab">Table 1</a>
+        </li>
+        <li>
+            <a href="#tab-table2" data-toggle="tab">Table 2</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+      <div class="tab-pane active" id="tab-table1">
+    <table class="table table-hover" id="usersData" style="width:100%">
+        <thead>
+          <tr>
+            <th style="text-align:left">ID</th>
+            <th style="text-align:left">Submission Time</th>
+            <th style="text-align:left">Applicant Name</th>
+            <th style="text-align:left">Requested Amount</th>
+            <th style="text-align:left">Classification</th>
+            <th style="text-align:left">Risk Score</th>
+            <th style="text-align:center">Action</th>
+            
+          
+            <!--<th>Origin IP </th>
+            <th>Geolocation </th> 
+            
+            <th class="disableFilterBy" style="width:143px"></th> -->
+          </tr>
+        </thead>
+        <tbody>  
+         {% comment %} {% for app in applicant_list %}  {% endcomment %}
+         {% if applicant_list %}  
+         {% for app in applicant_list %} 
+          <tr>
+            <td>{{app.app_id}}</td> 
+            <td>{{app.app_submission_time | date:"Y-m-d, H:m:s"}}</td>
+            <td>{{app.applicant_name}}</td>
+            <td>${{app.requested_amount}} </td>
+            <!--<td>{{app.origin_ip}}</td>
+            <td>{{app.geoLocation}}</td> -->
+            <td>{{app.classification}}</td>
+            <td>{{app.risk_table__Risk_Score}}
+                {% if app.risk_table__Risk_Score <= 25 %}
+                <div class="progress progress-xs progress-striped active">
+                    <div class="progress-bar bg-success" style="width:25%"></div>
+                  </div> 
+                  {% elif app.risk_table__Risk_Score <= 50 %} 
+                  <div class="progress progress-xs">
+                    <div class="progress-bar bg-info" style="width: 50%;background-color:#FDDA0D !important;"></div>
+                  </div>
+                  {% elif app.risk_table__Risk_Score <= 75 %}
+                  <div class="progress progress-xs">
+                    <div class="progress-bar bg-warning" style="width: 75%"></div>
+                  </div>
+                  {% elif app.risk_table__Risk_Score <= 100 %}
+                  <div class="progress progress-xs">
+                    <div class="progress-bar bg-danger" style="width: 95%"></div>
+                  </div>
+                  {% else %}
+                  <div class="progress progress-xs">
+                    <div class="progress-bar bg-secondary" style="width: 0%"></div>
+                  </div>
+                  {% endif %}
+                </td>
+                <td> 
+                  <center><a href="#editApplicantModal-{{forloop.counter}}" class="btn btn-info btn-sm" data-toggle="modal"><i class="fas fa-user-edit"></i> &nbsp; Review</a></center>
+              </td>     
+          </tr>
+          {% empty %}
+            <tr><td colspan="5">Currently no Data Available</td></tr>
+          {% endfor %}
+          {% endif %}
+        </tbody> 
+    </table>
+  </div>
+  <div class="tab-pane" id="tab-table2">
+    <table id="myTable2" class="table table-striped table-bordered" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+              <th style="text-align:left">ID</th>
+              <th style="text-align:left">Submission Time</th>
+              <th style="text-align:left">Applicant Name</th>
+              <th style="text-align:left">Requested Amount</th>
+              <th style="text-align:left">Classification</th>
+              <th style="text-align:left">Risk Score</th>
+              <th style="text-align:center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>  
+                      {% comment %} {% for app in applicant_list %}  {% endcomment %}
+                      {% if noneClassification %}  
+                      {% for app in noneClassification %} 
+                       <tr>
+                         <td>{{app.app_id}}</td> 
+                         <td>{{app.app_submission_time | date:"Y-m-d, H:m:s"}}</td>
+                         <td>{{app.applicant_name}}</td>
+                         <td>${{app.requested_amount}} </td>
+                         <!--<td>{{app.origin_ip}}</td>
+                         <td>{{app.geoLocation}}</td> -->
+                         <td>{{app.classification}}</td>
+                         <td>{{app.risk_table__Risk_Score}}
+                             {% if app.risk_table__Risk_Score <= 25 %}
+                             <div class="progress progress-xs progress-striped active">
+                                 <div class="progress-bar bg-success" style="width:25%"></div>
+                               </div> 
+                               {% elif app.risk_table__Risk_Score <= 50 %} 
+                               <div class="progress progress-xs">
+                                 <div class="progress-bar bg-info" style="width: 50%;background-color:#FDDA0D !important;"></div>
+                               </div>
+                               {% elif app.risk_table__Risk_Score <= 75 %}
+                               <div class="progress progress-xs">
+                                 <div class="progress-bar bg-warning" style="width: 75%"></div>
+                               </div>
+                               {% elif app.risk_table__Risk_Score <= 100 %}
+                               <div class="progress progress-xs">
+                                 <div class="progress-bar bg-danger" style="width: 95%"></div>
+                               </div>
+                               {% else %}
+                               <div class="progress progress-xs">
+                                 <div class="progress-bar bg-secondary" style="width: 0%"></div>
+                               </div>
+                               {% endif %}
+                             </td>
+                             <td> 
+                               <center><a href="#editApplicantModal-{{forloop.counter}}" class="btn btn-info btn-sm" data-toggle="modal"><i class="fas fa-user-edit"></i> &nbsp; Review</a></center>
+                           </td>     
+                       </tr>
+                       {% empty %}
+                         <tr><td colspan="5">Currently no Data Available</td></tr>
+                       {% endfor %}
+                       {% endif %}
+                     </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <div>
+      {% if applicant_list.has_other_pages %}
+    <nav aria-label="Page navigation example">
+    <ul class="pagination">
+        {% if applicant_list.has_previous %}
+        <li class="page-link"><a href="?page={{ applicant_list.previous_page_number }}"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link" href="#" tabindex="-1">Previous</a>
+        </li>
+        {% endif %}
+        {% if applicant_list.number|add:'-4' > 1 %}
+        <li class="page-link"><a href="?page={{ page_obj.number|add:'-5' }}">&hellip;</a></li>
+        {% endif %}
+
+    {% for i in applicant_list.paginator.page_range %}
+    {% if applicant_list.number == i %}
+        <li class="page-item active">
+            <a class="page-link" href="#">{{ i }} <span class="sr-only">(current)</span></a></li>
+    {% elif i > applicant_list.number|add:'-5' and i < applicant_list.number|add:'5' %}
+        <li class="page-link"><a href="?page={{ i }}">{{ i }}</a></li>
+    {% endif %}
+    {% endfor %}
+    {% if applicant_list.paginator.num_pages > applicant_list.number|add:'4' %}
+    <li class="page-link"><a href="?page={{ applicant_list.number|add:'5' }}">&hellip;</a></li>
+    {% endif %}
+
+    {% if applicant_list.has_next %}
+     <li class="page-link"><a href="?page={{ applicant_list.next_page_number }}"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
+    {% else %}
+    <li class="page-item disabled">
+        <a class="page-link" href="#" tabindex="-1">Next</a>
+    </li>
+    {% endif %}
+    </ul>
+</nav>
+    {% endif %} 
+</div>
+
+{% for app in applicant_list %}
+<!-- Modal -->
+<div class="modal fade" id="editApplicantModal-{{forloop.counter}}" role="dialog">
+    <div class="modal-dialog modal-lg">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title">Applicant Details</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form action="/applicantUpdate/{{app.app_id}}" id="userInserUpdateForm" name="userInserUpdateForm" class="form-horizontal" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="app_id" id="app_id" value={{app.app_id}}>
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col">
+                            <label for="name" class="col-sm-6 control-label">Start Time</label>
+                        </div>
+                        <div class="col">
+                            <label for="name" class="col-sm-6 control-label">End Time</label>
+                          </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <input type="datetime" class="form-control" id="app_start_time" name="app_start_time" value="{{app.app_start_time | date:"Y-m-d H:m:s"}}">
+                        </div>
+                        <div class="col">
+                            <input type="datetime" class="form-control" id="app_submission_time" name="app_submission_time" value="{{app.app_submission_time | date:"Y-m-d H:m:s"}}">
+                          </div>
+                    </div>
+                </div>
+                
+
+                <div class="form-group">
+                <div class="row">
+                    <div class="col">
+                        <label for="name" class="col-sm-6 control-label">Full Name</label>
+                    </div>
+                    <div class="col">
+                        <label for="name" class="col-sm-2 control-label">Email</label>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col">
+                        <input type="text" class="form-control" id="applicant_name" name="applicant_name" placeholder="Enter Name" value="{{app.applicant_name}}" maxlength="50" required="">
+                    </div>
+                    <div class="col">
+                        <input type="text" class="form-control" id="app_email" name="app_email" placeholder="Enter Email" value="{{app.app_email}}" maxlength="50" required="">
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                <div class="row">
+                    <div class="col">
+                        <label class="col-sm-2 control-label">SSN</label>
+                    </div>
+                    <div class="col">
+                        <label class="col-sm-2 control-label">Phone</label>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col">
+                        <input type="text" class="form-control" id="app_ssn" name="app_ssn" placeholder="Enter SSN" value="{{app.app_ssn}}" required="">
+                    </div>
+                    <div class="col">
+                        <input type="text" class="form-control" id="app_onphone" name="app_onphone" placeholder="Enter Phone" value="{{app.app_onphone}}" required="">
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                <label class="col-sm-2 control-label">Address</label>
+                <div class="col-sm-12">
+                    <textarea class="form-control" id="app_mailing" name="app_mailing" placeholder="Enter Address" required>{{app.app_mailing}}</textarea>
+                </div>
+                </div>
+                <div class="form-group">
+                <div class="row">
+                    <div class="col">
+                        <label class="col-sm-2 control-label">Renter </label>
+                    </div>
+                    <div class="col">
+                        <label class="col-sm-6 control-label">Unit Type</label>
+                    </div>
+                    <div class="col">
+                        <label class="col-sm-8 control-label">Requested Amount</label>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col">
+                        <input type="number" class="form-control" id="renter" name="renter" placeholder="Enter Renter" value="{{app.renter}}" required="">
+                    </div>
+                    <div class="col">
+                      <select class="custom-select" id="unit_type" name="unit_type">
+                        {% if app.unit_type == 'Single-Family' %}
+                        <option value="{{app.unit_type}}">{{app.unit_type}}</option>
+                        <option value="Multi-Family">Multi-Family</option>
+                        {% elif app.unit_type == 'Multi-Family' %}
+                        <option value="{{app.unit_type}}">{{app.unit_type}}</option>
+                        <option value="Single-Family">Single-Family</option>
+                        {% else %}
+                        <option value="">Select Category</option>
+                        <option value="Single-Family">Single-Family</option>
+                        <option value="Multi-Family">Multi-Family</option>
+                        {% endif %}
+                    </select>
+                    </div>
+                    <div class="col">
+                        <div class="input-group mb-3">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text">$</span>
+                          </div>
+                          <input type="number" class="form-control" id="requested_amount" name="requested_amount" value="{{app.requested_amount}}" aria-label="requested_amount">
+                        </div>
+                    </div>
+                  </div>
+                </div>
+                  <div class="form-group">
+                  <div class="row">
+                    <div class="col">
+                        <label class="col-sm-6 control-label">Origin IP</label>
+                    </div>
+                    <div class="col">
+                        <label class="col-sm-6 control-label">Geolocation</label>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col">
+                        <input type="text" class="form-control" id="origin_ip" name="origin_ip" value="{{app.origin_ip}}">
+                    </div>
+                    <div class="col">
+                        <input type="text" class="form-control" id="geoLocation" name="geoLocation" placeholder="Geo-Location not found" value="{{app.geoLocation}}">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <div class="row">
+                    <div class="col">
+                        <label class="col-sm-2 control-label">Classification</label>  
+                    </div>
+                    <div class="col">
+                        <label class="col-sm-6 control-label">Risk Score</label>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col">
+                        <select class="custom-select" name="classification" id="classification">
+                            {% if app.classification == 'Fraud' %}
+                            <option value="{{app.classification}}">{{app.classification}}</option>
+                            <option value="Legitimate">Legitimate</option>
+
+                            {% elif app.classification == 'Legitimate'%}
+                            <option value="{{app.classification}}">{{app.classification}}</option>
+                            <option value="Fraud">Fraud</option>
+                            {% else %}
+                            <option value="">Select Category</option>
+                            <option value="Fraud">Fraud</option>
+                            <option value="Legitimate">Legitimate</option>
+                            {% endif %}
+                        </select>  
+                    </div>
+                    <div class="col">
+                        {% comment %} <input type="text" class="form-control" id="risk_score" name="risk_score" value="{{app.risk_table__Risk_Score}}" required> {% endcomment %}
+                        <div class="list-group-item disabled" aria-disabled="true" role="alert">
+                          {{app.risk_table__Risk_Score}}
+                        </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card" style="width: 48rem;">
+                    <div class="card-body">
+                        <h5 style="text-align:center;"><b>Machine Learning Analysis</h5>
+
+                        <div class="row">
+                            <div class="col">
+                                <p class="card-text"><b>Predict Class</b> </p>
+                            </div>
+                            <div class="col">
+                                <p class="card-text"><b>Risk Identifier</b> </p>
+                            </div>
+                          </div>
+                          
+                          
+                          <div class="row">
+                            {% if app.risk_table__predict_class %}
+                            <div class="col">
+                                <p class="list-group-item disabled" aria-disabled="true" >{{app.risk_table__predict_class}}</p><br>
+                            </div>
+                            {% else %}
+                            <div class="col">
+                              <div class="list-group-item disabled" aria-disabled="true" role="alert">
+                                Value Not Found In Predict Class !
+                              </div>
+                            </div>
+                            {% endif %}
+                            <div class="col"> 
+                            {% if app.risk_table__Decision_Criteria %}
+                            {% comment %} {% for rsk in app.risk_table__Decision_Criteria %} {% endcomment %}
+                            {% for rsk in app.risk_table__Decision_Criteria|split:"," %}  
+                            <div class="col-sm-12">
+                             <ul class="list-group">
+                                    <li class="list-group-item disabled" aria-disabled="true">{{ rsk }}</li><br>
+                                  </ul> 
+                                </div>
+                              
+                             {% endfor %}
+                             {% else %}
+                             <div class="list-group-item disabled" aria-disabled="true" role="alert">
+                              Decision Criteria Not Found !
+                            </div>
+                             
+                             {% endif%}
+                             
+                            </div>
+                          </div>   
+                    </div>
+                </div>
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit" class="btn btn-primary" id="btn-save" name= "Submit" value="addNewUser">Save Changes
+                    </button>
+                    </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div> 
+    </div>
+  </div>
+  {% endfor %}
+
+  {% if messages %}
+  {% for message in messages %}
+  <div id="msg"> {{message}}  </div>
+  {% endfor %}
+  {% endif %}
+
+</div>
+{% endblock %}
+   
+{% block javascript %}
+{% include 'ml_fraudulent_app/adminlte/lib/_scripts.html' %}
+<script>
+    function showValue(){
+      var selectedpage = document.getElementById("pageno").value;
+      var iNum = parseInt(selectedpage); //Output will be 234.
+      console.log (iNum)
+
+      $.ajax({
+        type: "GET",
+        url: '/',
+        data:{
+              'selectedpage': iNum,
+              },
+    dataType : "text",
+    success: function(data) {
+        // do whatever in here for success, errors
+        console.log("pageno transfered to view page")
+        
+                }
+            })  
+          }
+
+      $('#resetScript').click(function(){
+        $('#img').show(); 
+        $.ajax({
+        url: "/output",
+        context: document.body,
+         success:function(result){
+          alert("Table has been updated successfully");
+             $('#img').hide();
+             location.reload(true); 
+         }
+         
+      });
+    });
+         
+
+
+
+      /*    
+     function goPython(){
+        $.ajax({
+         url: "/output",
+         context: document.body
+        }).done(function() {
+         alert('finished Reset python script');
+        });
+    } 
+   */
+    /* function getpage()
+    {
+        $.ajax({
+            url: "/pageview",
+            context: document.body
+           }).done(function() {
+            alert('Page selected');
+           });
+    }  */
+  /*
+    function geolocationPython(){
+        $.ajax({
+         url: "/geolocationView",
+         context: document.body
+        }).done(function() {
+         alert('Geolocation has been updated successfully !');
+        });
+    }
+    */
+  /*  
+function reevaluate(){
+  $.ajax({
+    url: "/evaluate",
+    context: document.body
+   }).done(function() {
+    alert('ML scripts has been completed successfully !');
+   });
+}
+*/
+
+$('#geolocation').click(function(){
+  $('#img').show(); 
+  $.ajax({
+  url: "/geolocationView",
+  context: document.body,
+   success:function(result){
+       $('#img').hide(); 
+      console.log(result);
+   }
+});
+});
+
+/* single Geo localtion update*/
+$('#singlegeoupdate').click(function(){
+  $('#img').show(); 
+  $.ajax({
+  url: "/singlegeoLocationupdateView",
+  context: document.body,
+   success:function(result){
+       $('#img').hide(); 
+      console.log(result);
+   }
+});
+});
+
+
+
+$('#reevaluate').click(function(){
+                $('#img').show();
+                $.ajax({
+                  url: "/evaluate",
+                  context: document.body,
+                   success:function(result){
+                       $('#img').hide(); 
+                      console.log(result);
+                      alert("Table has been updated successfully");
+                      location.reload(true);
+                   }
+                });     
+  });
+/* Data Table Function */
+
+
+$(document).ready(function () {
+  $('a[data-toggle="tab"]').on( 'shown.bs.tab', function (e) {
+    $.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
+} );
+
+            $('#usersData').DataTable({
+            "order":[[0, "asc"]],
+            "sDom": "lfrti",
+            "orderFixed": [ 0, 'asc' ],
+            
+            bPaginate: false,
+            paging: false,
+            stateSave:true,
+            responsive: true,     
+            orderCellsTop: true,
+            fixedHeader: true,
+            });
+            $('#myTable2').DataTable().search( '' ).draw();
+    });
+
+
+
+
+
+/*End Data Table
+ buttons: [
+                'csv', 'excel', 'pdf', 'print',
+                {
+                    extend: 'searchPanes',
+                    config: {
+                        cascadePanes: true,
+                        layout: 'columns-4'
+                    }, 
+                } ],
+
+*/
+
+
+setTimeout(function(){
+    if ($('#msg').length > 0) {
+        $('#msg').remove();
+    }
+}, 2000)    // 2000 millisecond
+
+  </script>
+{% endblock %} 

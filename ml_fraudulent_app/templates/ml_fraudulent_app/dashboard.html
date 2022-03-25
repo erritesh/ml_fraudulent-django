@@ -19,6 +19,82 @@
   .card {
     margin-top: 0rem!important;
   }
+  .square {
+    height: 100px;
+    width: 190px;
+    padding: 25px; 
+    font-size: 40px;
+    background-color: #97f545;
+    display: inline-block; 
+    border: 1px #484a47; 
+    margin:10px;
+  }
+  .content-header {
+    padding: 5px 0.5rem;
+}
+.highcharts-figure .chart-container {
+  width: 300px;
+  height: 200px;
+  float: left;
+  
+}
+
+.highcharts-figure,
+.highcharts-data-table table {
+  width: 600px;
+  margin: 0 auto;
+  padding-left:60px;
+}
+
+.highcharts-data-table table {
+  font-family: Verdana, sans-serif;
+  border-collapse: collapse;
+  border: 1px solid #ebebeb;
+  margin: 10px auto;
+  text-align: center;
+  width: 100%;
+  max-width: 500px;
+}
+
+.highcharts-data-table caption {
+  padding: 1em 0;
+  font-size: 1.2em;
+  color: #555;
+}
+
+.highcharts-data-table th {
+  font-weight: 600;
+  padding: 0.5em;
+}
+
+.highcharts-data-table td,
+.highcharts-data-table th,
+.highcharts-data-table caption {
+  padding: 0.5em;
+}
+
+.highcharts-data-table thead tr,
+.highcharts-data-table tr:nth-child(even) {
+  background: #f8f8f8;
+}
+
+.highcharts-data-table tr:hover {
+  background: #f1f7ff;
+}
+
+@media (max-width: 600px) {
+  .highcharts-figure,
+  .highcharts-data-table table {
+      width: 100%;
+  }
+
+  .highcharts-figure .chart-container {
+      width: 300px;
+      float: none;
+      margin: 0 auto;
+  }
+}
+
 </style>
 {% endblock %}
 
@@ -122,17 +198,6 @@
                     </div>
                     </section>
 
-                    <div class="col-lg-12">
-                      <div class="card">
-                        <div class="card-header border-0">
-                          <h3 class="card-title">Geo-tagging Origin IP's</h3>
-                        </div>
-                        <div class="card-body table-responsive p-0">  
-                        <div id="map1"></div>
-                      </div>
-                      </div>
-                    </div>
-
                     <div class="content">
                       <div class="container-fluid">
                         <div class="row">
@@ -145,18 +210,21 @@
                               </div>
                               <div class="card-body">
                         <div> 
-                          <canvas id="lineDashboard" width="450px" height="200px" 
+                          <canvas id="lineDashboard" width="450px" height="250px" 
                           aria-label="chart" role="img"></canvas>
                         </div>
 
                         <div>
-                        <canvas id="riskDashboard" width="450px" height="218px" 
+                        <canvas id="riskDashboard" width="450px" height="250px" 
                         aria-label="chart" role="img"></canvas>
                         </div>
+
                         <div>
-                          <canvas id="countDashboard" width="450px" height="218px" 
+                          <canvas id="countDashboard" width="450px" height="250px" 
                           aria-label="chart" role="img"></canvas> 
                         </div>
+                        
+
                       </div>
                     </div>    
                   </div>
@@ -165,28 +233,41 @@
                             <div class="card">
                               <div class="card-header border-0">
                                 <div class="d-flex justify-content-between">
-                                  <h3 class="card-title">ML Attributes</h3>
+                                  <h3 class="card-title">Model Performance</h3>
                                 </div>
                               </div> 
                               <div class="card-body">
                                 <div> 
-                                  <canvas id="riskAccuracy" width="450px" height="300px" 
-                                  aria-label="chart" role="img"></canvas>
+                                 <!-- <canvas id="riskAccuracy" width="450px" height="300px" 
+                                  aria-label="chart" role="img"></canvas> 
+                                  <div class="square"><b>{{permatchcount}}%</b></div>
+                                  <div class="square"><b>{{pending_query_set}}</b></div> -->
+
+                                  <div class="card-body table-responsive p-0">  
+                                  <div class="row" style="margin-right: 0.5px; margin-left: 0.5px;"> 
+
+                                    <figure class="highcharts-figure">
+                                      <div id="container-speed" class="chart-container"></div>
+                                  </figure> 
                                 </div>
-                              </div>  
+                              </div>
+                            </div>
+                              </div>
+                              
 
                               <div class="card-header border-0">
                                 <div class="d-flex justify-content-between">
-                                  <h3 class="card-title">Risk Indicators</h3>
+                                  <h3 class="card-title">Fraud Risk Indicators (Top 10)</h3>
                                 </div>
                               </div>
                               <div class="card-body">
-                              <table id="maintable" class="table table-striped table-bordered table-lg" style="width:100%">
+                              <table id="maintable" class="table table-striped table-bordered table-sm" style="width:100%">
                                <thead>
                                 <tr>
                                   <th>#</th>
                                   <th>Indicator</th>
-                                 <th>App Count</th>
+                                 <!-- <th>App Count</th> -->
+                                 <th> Importance </th>
                                 <th>%</th>
                               </tr>
                            </thead>
@@ -197,8 +278,10 @@
                               <td>{{importance_val.ImportanceID}}</td>
                               
                               <td>{{importance_val.Decision_Criteria}} </td>
-                              <td> {{importance_val.Count}} 
+                              {% comment %} {{importance_val.Count}}  {% endcomment %}
+                              <td> 
                               <!-- Progress Bar Code  -->
+                              <p></p>
       {% if importance_rank %} 
        {% if importance_val.Importance >= 90  %}
        <div class="progress progress-xs progress-striped active">
@@ -245,7 +328,20 @@
                       </font>
                       </div>
                       
+                    <div class="col-lg-12">
+                      <div class="card">
+                        <div class="card-header border-0">
+                          <h3 class="card-title">Geotagging Origin IPs</h3>
+                        </div>
+                      <div class="card-body table-responsive p-0">  
+                        <div id="map1"></div>
+                      </div>
+                      </div>
                     </div>
+                  </div>
+                </div>
+
+                    
                     
                     
 {% endblock %}
@@ -405,7 +501,10 @@ var lineDashboard = new Chart(ctx,{
 var graph = {{ jsondata| safe }}
 Plotly.plot("map1",graph, {})
 
-/* Risk Accuracy Map */
+
+
+
+/* Risk Accuracy Map 
 
 var ctx = document.getElementById("riskAccuracy").getContext("2d")
   var riskAccuracy = new Chart(ctx,{
@@ -486,7 +585,158 @@ var ctx = document.getElementById("riskAccuracy").getContext("2d")
       },
      
   });
+*/
+var gaugeOptions = {
+  chart: {
+      type: 'solidgauge'
+  },
 
+  title: null,
+
+  pane: {
+      center: ['50%', '85%'],
+      size: '140%',
+      startAngle: -90,
+      endAngle: 90,
+      background: {
+          backgroundColor:
+              Highcharts.defaultOptions.legend.backgroundColor || '#EEE',
+          innerRadius: '60%',
+          outerRadius: '100%',
+          shape: 'arc'
+      }
+  },
+
+  exporting: {
+      enabled: false
+  },
+
+  tooltip: {
+      enabled: false
+  },
+
+  // the value axis
+  yAxis: {
+      stops: [
+          [0.1, '#DF5353'], // red
+          [0.7, '#DDDF0D'], // yellow
+          [1.0, '#55BF3B'] // green 
+      ],
+      lineWidth: 0,
+      tickWidth: 0,
+      minorTickInterval: null,
+      tickAmount: 2,
+      title: {
+          y: -70
+      },
+      labels: {
+          y: 16
+      }
+  },
+
+  plotOptions: {
+      solidgauge: {
+          dataLabels: {
+              y: 5,
+              borderWidth: 0,
+              useHTML: true
+          }
+      }
+  }
+};
+
+// The speed gauge
+var chartSpeed = Highcharts.chart('container-speed', Highcharts.merge(gaugeOptions, {
+  yAxis: {
+      min: 0,
+      max: 100,
+      title: {
+          text: 'Model Accuracy'
+      }
+  },
+
+  credits: {
+      enabled: false
+  },
+
+  series: [{
+      name: 'Model Accuracy',
+      data: [{{permatchcount}}],
+      dataLabels: {
+          format:
+              '<div style="text-align:center">' +
+              '<span style="font-size:25px">{y}</span><br/>' +
+              '<span style="font-size:14px;opacity:0.4">Percentage</span>' +
+              '</div>'
+      },
+      tooltip: {
+          valueSuffix: ' percentage'
+      }
+  }]
+
+}));
+
+// The RPM gauge
+var chartRpm = Highcharts.chart('container-rpm', Highcharts.merge(gaugeOptions, {
+  yAxis: {
+      min: 0,
+      max: 5,
+      title: {
+          text: 'RPM'
+      }
+  },
+
+  series: [{
+      name: 'RPM',
+      data: [1],
+      dataLabels: {
+          format:
+              '<div style="text-align:center">' +
+              '<span style="font-size:25px">{y:.1f}</span><br/>' +
+              '<span style="font-size:12px;opacity:0.4">' +
+              '* 1000 / min' +
+              '</span>' +
+              '</div>'
+      },
+      tooltip: {
+          valueSuffix: ' revolutions/min'
+      }
+  }]
+
+}));
+
+// Bring life to the dials
+setInterval(function () {
+  // Speed
+  var point,
+      newVal,
+      inc;
+
+  if (chartSpeed) {
+      point = chartSpeed.series[0].points[0];
+      inc = Math.round((Math.random() - 0.5) * 100);
+      newVal = point.y + inc;
+
+      if (newVal < 0 || newVal > 200) {
+          newVal = point.y - inc;
+      }
+
+      point.update(newVal);
+  }
+
+  // RPM
+  if (chartRpm) {
+      point = chartRpm.series[0].points[0];
+      inc = Math.random() - 0.5;
+      newVal = point.y + inc;
+
+      if (newVal < 0 || newVal > 5) {
+          newVal = point.y - inc;
+      }
+
+      point.update(newVal);
+  }
+}, 2000);
 
   </script>
 {% endblock %}

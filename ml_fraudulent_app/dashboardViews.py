@@ -144,7 +144,7 @@ def dashboard(request):
 
     layout = dict(
               geo = dict(projection = {'type':'natural earth'}),
-                width=600, 
+                 width=600, 
                 height=700,
                 autosize=True,
                 #paper_bgcolor="LightSteelBlue", 
@@ -152,17 +152,18 @@ def dashboard(request):
     
     choromap = go.Figure(data = [data],layout = layout)
     choromap.data[0].update(zmin=0, zmax=100,colorbar_len=0.80)
-    choromap.update_layout(width=1050,height=600, margin={"r":0,"t":0,"l":20,"b":10})
+    choromap.update_layout(width=950,height=600, margin={"r":10,"t":0,"l":20,"b":10})
     
     jsondata = json.dumps(choromap, cls=plotly.utils.PlotlyJSONEncoder)
 
+    
     # From Imporance Rank table 
     importance_rank = Importance_rank_table.objects.all().values('ImportanceID','Decision_Criteria','Importance','Count')
 
 
     fraud_ReqAmount = Applicant_Details.objects.filter(risk_table__predict_class='Fraud').values('requested_amount').aggregate(Sum('requested_amount'))
     fraud_amount= fraud_ReqAmount.values()
-    print(type(fraud_amount))
+    
     #final_fraud_ReqAmount= int(float(fraud_ReqAmount))
 
     legit_ReqAmount = Applicant_Details.objects.filter(risk_table__predict_class='Legitimate').values('requested_amount').aggregate(Sum('requested_amount'))
@@ -170,6 +171,7 @@ def dashboard(request):
     
 
     context = {
+                
                 "applicant_details":applicant_details,
                 "total_query_set":total_query_set,
                 "fraud_query_set":fraud_query_set,
