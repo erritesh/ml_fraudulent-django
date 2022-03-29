@@ -69,7 +69,6 @@ thead input {
 .card {
   margin-top: 0rem!important;
 }
-
 </style>
 <div class="row mb-2">
     <div class="col-sm-4">
@@ -190,221 +189,207 @@ thead input {
 
   <hr class="mb-3"/>
 
-  <!--Start Test  tabs link -->
-  <ul class="nav nav-tabs" id="myTab">
-    <li class="nav-item">
-      <a class="nav-link active" href="#All_Applications" data-target="#All_Applications" data-toggle="tab" style="color:#000000;font-size:16px;overflow: hidden">All Applications</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#Application_Pending_Review" data-target="#Application_Pending_Review" data-toggle="tab" style="color:#000000;font-size:16px;overflow: hidden">Application Pending Review</a>
-    </li>
+  <div class="tab">
+    <button class="tablinks" onclick="openClassification(event, 'withClassification')" id="defaultOpen">All Applications</button>
+    <button class="tablinks" onclick="openClassification(event, 'withoutClassification')">Application Pending Review</button>
+    
+  </div>
+  
+  <div id="withClassification" class="tabcontent">
+    
+    <table class="table table-hover" id="usersData" style="width:100%">
+      <thead>
+        <tr>
+          <th style="text-align:left">ID</th>
+          <th style="text-align:left">Submission Time</th>
+          <th style="text-align:left">Applicant Name</th>
+          <th style="text-align:left">Requested Amount</th>
+          <th style="text-align:left">Classification</th>
+          <th style="text-align:left">Risk Score</th>
+          <th style="text-align:center">Action</th>
+        </tr>
+      </thead>
+      <tbody>  
+       {% comment %} {% for app in applicant_list %}  {% endcomment %}
+       {% if applicant_list %}  
+       {% for app in applicant_list %} 
+        <tr>
+          <td>{{app.app_id}}</td> 
+          <td>{{app.app_submission_time | date:"Y-m-d, H:m:s"}}</td>
+          <td>{{app.applicant_name}}</td>
+          <td>${{app.requested_amount}} </td>
+          <!--<td>{{app.origin_ip}}</td>
+          <td>{{app.geoLocation}}</td> -->
+          <td>{{app.classification}}</td>
+          <td>{{app.risk_table__Risk_Score}}
+              {% if app.risk_table__Risk_Score <= 25 %}
+              <div class="progress progress-xs progress-striped active">
+                  <div class="progress-bar bg-success" style="width:25%"></div>
+                </div> 
+                {% elif app.risk_table__Risk_Score <= 50 %} 
+                <div class="progress progress-xs">
+                  <div class="progress-bar bg-info" style="width: 50%;background-color:#FDDA0D !important;"></div>
+                </div>
+                {% elif app.risk_table__Risk_Score <= 75 %}
+                <div class="progress progress-xs">
+                  <div class="progress-bar bg-warning" style="width: 75%"></div>
+                </div>
+                {% elif app.risk_table__Risk_Score <= 100 %}
+                <div class="progress progress-xs">
+                  <div class="progress-bar bg-danger" style="width: 95%"></div>
+                </div>
+                {% else %}
+                <div class="progress progress-xs">
+                  <div class="progress-bar bg-secondary" style="width: 0%"></div>
+                </div>
+                {% endif %}
+              </td>
+              <td> 
+                <center><a href="#editApplicantModal-{{forloop.counter}}" class="btn btn-info btn-sm" data-toggle="modal"><i class="fas fa-user-edit"></i> &nbsp; Review</a></center>
+            </td>     
+        </tr>
+        {% empty %}
+          <tr><td colspan="5">Currently no Data Available</td></tr>
+        {% endfor %}
+        {% endif %}
+      </tbody> 
+  </table>
+  <div>
+    {% if applicant_list.has_other_pages %}
+  <nav aria-label="Page navigation example">
+  <ul class="pagination">
+      {% if applicant_list.has_previous %}
+      <li class="page-link"><a href="?page={{ applicant_list.previous_page_number }}"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
+      {% else %}
+      <li class="page-item disabled">
+          <a class="page-link" href="#" tabindex="-1">Previous</a>
+      </li>
+      {% endif %}
+      {% if applicant_list.number|add:'-4' > 1 %}
+      <li class="page-link"><a href="?page={{ page_obj.number|add:'-5' }}">&hellip;</a></li>
+      {% endif %}
+
+  {% for i in applicant_list.paginator.page_range %}
+  {% if applicant_list.number == i %}
+      <li class="page-item active">
+          <a class="page-link" href="#">{{ i }} <span class="sr-only">(current)</span></a></li>
+  {% elif i > applicant_list.number|add:'-5' and i < applicant_list.number|add:'5' %}
+      <li class="page-link"><a href="?page={{ i }}">{{ i }}</a></li>
+  {% endif %}
+  {% endfor %}
+  {% if applicant_list.paginator.num_pages > applicant_list.number|add:'4' %}
+  <li class="page-link"><a href="?page={{ applicant_list.number|add:'5' }}">&hellip;</a></li>
+  {% endif %}
+
+  {% if applicant_list.has_next %}
+   <li class="page-link"><a href="?page={{ applicant_list.next_page_number }}"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
+  {% else %}
+  <li class="page-item disabled">
+      <a class="page-link" href="#" tabindex="-1">Next</a>
+  </li>
+  {% endif %}
   </ul>
-  
-  <div class="tab-content">
-    <div class="tab-pane in active" id="All_Applications">
-      <table class="table table-hover" id="usersData" style="width:100%">
-        <thead>
-          <tr>
-            <th style="text-align:left">ID</th>
-            <th style="text-align:left">Submission Time</th>
-            <th style="text-align:left">Applicant Name</th>
-            <th style="text-align:left">Requested Amount</th>
-            <th style="text-align:left">Classification</th>
-            <th style="text-align:left">Risk Score</th>
-            <th style="text-align:center">Action</th>
-          </tr>
-        </thead>
-        <tbody>  
-         {% comment %} {% for app in applicant_list %}  {% endcomment %}
-         {% if applicant_list %}  
-         {% for app in applicant_list %} 
-          <tr>
-            <td>{{app.app_id}}</td> 
-            <td>{{app.app_submission_time | date:"Y-m-d, H:m:s"}}</td>
-            <td>{{app.applicant_name}}</td>
-            <td>${{app.requested_amount}} </td>
-            <!--<td>{{app.origin_ip}}</td>
-            <td>{{app.geoLocation}}</td> -->
-            <td>{{app.classification}}</td>
-            <td>{{app.risk_table__Risk_Score}}
-                {% if app.risk_table__Risk_Score <= 25 %}
-                <div class="progress progress-xs progress-striped active">
-                    <div class="progress-bar bg-success" style="width:25%"></div>
-                  </div> 
-                  {% elif app.risk_table__Risk_Score <= 50 %} 
-                  <div class="progress progress-xs">
-                    <div class="progress-bar bg-info" style="width: 50%;background-color:#FDDA0D !important;"></div>
-                  </div>
-                  {% elif app.risk_table__Risk_Score <= 75 %}
-                  <div class="progress progress-xs">
-                    <div class="progress-bar bg-warning" style="width: 75%"></div>
-                  </div>
-                  {% elif app.risk_table__Risk_Score <= 100 %}
-                  <div class="progress progress-xs">
-                    <div class="progress-bar bg-danger" style="width: 95%"></div>
-                  </div>
-                  {% else %}
-                  <div class="progress progress-xs">
-                    <div class="progress-bar bg-secondary" style="width: 0%"></div>
-                  </div>
-                  {% endif %}
-                </td>
-                <td> 
-                  <center><a href="#editApplicantModal-{{forloop.counter}}" class="btn btn-info btn-sm" data-toggle="modal"><i class="fas fa-user-edit"></i> &nbsp; Review</a></center>
-              </td>     
-          </tr>
-          {% empty %}
-            <tr><td colspan="5">Currently no Data Available</td></tr>
-          {% endfor %}
-          {% endif %}
-        </tbody> 
-    </table>
-  
-    <div>
-      {% if applicant_list.has_other_pages %}
-    <nav aria-label="Page navigation example">
-    <ul class="pagination">
-        {% if applicant_list.has_previous %}
-        <li class="page-link"><a href="?page={{ applicant_list.previous_page_number }}#All_Applications"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
-        {% else %}
-        <li class="page-item disabled">
-            <a class="page-link" href="#" tabindex="-1">Previous</a>
-        </li>
+</nav>
+  {% endif %} 
+</div>
+</div>
+
+  <div id="withoutClassification" class="tabcontent">
+    
+    <table class="table table-hover" id="withoutClassificationData" style="width:100%">
+      <thead>
+        <tr>
+          <th style="text-align:left">ID</th>
+          <th style="text-align:left">Submission Time</th>
+          <th style="text-align:left">Applicant Name</th>
+          <th style="text-align:left">Requested Amount</th>
+          <th style="text-align:left">Classification</th>
+          <th style="text-align:left">Risk Score</th>
+          <th style="text-align:center">Action</th>
+        </tr>
+      </thead>
+      <tbody>  
+       {% comment %} {% for app in applicant_list %}  {% endcomment %}
+       {% if noneClassification %}  
+       {% for app in noneClassification %} 
+        <tr>
+          <td>{{app.app_id}}</td> 
+          <td>{{app.app_submission_time | date:"Y-m-d, H:m:s"}}</td>
+          <td>{{app.applicant_name}}</td>
+          <td>${{app.requested_amount}} </td>
+          <td>{{app.classification}}</td>
+          <td>{{app.risk_table__Risk_Score}}
+              {% if app.risk_table__Risk_Score <= 25 %}
+              <div class="progress progress-xs progress-striped active">
+                  <div class="progress-bar bg-success" style="width:25%"></div>
+                </div> 
+                {% elif app.risk_table__Risk_Score <= 50 %} 
+                <div class="progress progress-xs">
+                  <div class="progress-bar bg-info" style="width: 50%;background-color:#FDDA0D !important;"></div>
+                </div>
+                {% elif app.risk_table__Risk_Score <= 75 %}
+                <div class="progress progress-xs">
+                  <div class="progress-bar bg-warning" style="width: 75%"></div>
+                </div>
+                {% elif app.risk_table__Risk_Score <= 100 %}
+                <div class="progress progress-xs">
+                  <div class="progress-bar bg-danger" style="width: 95%"></div>
+                </div>
+                {% else %}
+                <div class="progress progress-xs">
+                  <div class="progress-bar bg-secondary" style="width: 0%"></div>
+                </div>
+                {% endif %}
+              </td>
+              <td> 
+                <center><a href="#editNoneApplicantModal-{{forloop.counter}}" class="btn btn-info btn-sm" data-toggle="modal"><i class="fas fa-user-edit"></i> &nbsp; Review</a></center>
+            </td>     
+        </tr>
+        {% empty %}
+          <tr><td colspan="5">Currently no Data Available</td></tr>
+        {% endfor %}
         {% endif %}
-        {% if applicant_list.number|add:'-4' > 1 %}
-        <li class="page-link"><a href="?page={{ page_obj.number|add:'-5' }}#All_Applications">&hellip;</a></li>
-        {% endif %}
-  
-    {% for i in applicant_list.paginator.page_range %}
-    {% if applicant_list.number == i %}
-        <li class="page-item active">
-            <a class="page-link" href="#">{{ i }} <span class="sr-only">(current)</span></a></li>
-    {% elif i > applicant_list.number|add:'-5' and i < applicant_list.number|add:'5' %}
-        <li class="page-link"><a href="?page={{ i }}#All_Applications">{{ i }}</a></li>
-    {% endif %}
-    {% endfor %}
-    {% if applicant_list.paginator.num_pages > applicant_list.number|add:'4' %}
-    <li class="page-link"><a href="?page={{ applicant_list.number|add:'5' }}#All_Applications">&hellip;</a></li>
-    {% endif %}
-  
-    {% if applicant_list.has_next %}
-     <li class="page-link"><a href="?page={{ applicant_list.next_page_number }}#All_Applications"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
-    {% else %}
-    <li class="page-item disabled">
-        <a class="page-link" href="#" tabindex="-1">Next</a>
-    </li>
-    {% endif %}
-    </ul>
-  </nav>
-    {% endif %} 
-  </div>
-  </div>
- 
+      </tbody> 
+  </table>
+  <div>
+    {% if noneClassification.has_other_pages %}
+  <nav aria-label="Page navigation example">
+  <ul class="pagination">
+      {% if noneClassification.has_previous %}
+      <li class="page-link"><a href="?page={{ noneClassification.previous_page_number }}"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
+      {% else %}
+      <li class="page-item disabled">
+          <a class="page-link" href="#" tabindex="-1">Previous</a>
+      </li>
+      {% endif %}
+      {% if noneClassification.number|add:'-4' > 1 %}
+      <li class="page-link"><a href="?page={{ page_obj.number|add:'-5' }}">&hellip;</a></li>
+      {% endif %}
 
-    <div class="tab-pane fade" id="Application_Pending_Review">
-      
-      <table class="table table-hover" id="withoutClassificationData" style="width:100%">
-        <thead>
-          <tr>
-            <th style="text-align:left">ID</th>
-            <th style="text-align:left">Submission Time</th>
-            <th style="text-align:left">Applicant Name</th>
-            <th style="text-align:left">Requested Amount</th>
-            <th style="text-align:left">Classification</th>
-            <th style="text-align:left">Risk Score</th>
-            <th style="text-align:center">Action</th>
-          </tr>
-        </thead>
-        <tbody>  
-         {% comment %} {% for app in applicant_list %}  {% endcomment %}
-         {% if noneClassification %}  
-         {% for app in noneClassification %} 
-          <tr>
-            <td>{{app.app_id}}</td> 
-            <td>{{app.app_submission_time | date:"Y-m-d, H:m:s"}}</td>
-            <td>{{app.applicant_name}}</td>
-            <td>${{app.requested_amount}} </td>
-            <td>{{app.classification}}</td>
-            <td>{{app.risk_table__Risk_Score}}
-                {% if app.risk_table__Risk_Score <= 25 %}
-                <div class="progress progress-xs progress-striped active">
-                    <div class="progress-bar bg-success" style="width:25%"></div>
-                  </div> 
-                  {% elif app.risk_table__Risk_Score <= 50 %} 
-                  <div class="progress progress-xs">
-                    <div class="progress-bar bg-info" style="width: 50%;background-color:#FDDA0D !important;"></div>
-                  </div>
-                  {% elif app.risk_table__Risk_Score <= 75 %}
-                  <div class="progress progress-xs">
-                    <div class="progress-bar bg-warning" style="width: 75%"></div>
-                  </div>
-                  {% elif app.risk_table__Risk_Score <= 100 %}
-                  <div class="progress progress-xs">
-                    <div class="progress-bar bg-danger" style="width: 95%"></div>
-                  </div>
-                  {% else %}
-                  <div class="progress progress-xs">
-                    <div class="progress-bar bg-secondary" style="width: 0%"></div>
-                  </div>
-                  {% endif %}
-                </td>
-                <td> 
-                  <center><a href="#editNoneApplicantModal-{{forloop.counter}}" class="btn btn-info btn-sm" data-toggle="modal"><i class="fas fa-user-edit"></i> &nbsp; Review</a></center>
-              </td>     
-          </tr>
-          {% empty %}
-            <tr><td colspan="5">Currently no Data Available</td></tr>
-          {% endfor %}
-          {% endif %}
-        </tbody> 
-    </table>
-  
-    <!-- TAB 2 Pagination code -->
-    <div>
-      {% if noneClassification.has_other_pages %}
-    <nav aria-label="Page navigation example">
-    <ul class="pagination">
-        {% if noneClassification.has_previous %}
-        <li class="page-link"><a href="?pageno={{ noneClassification.previous_page_number }}#Application_Pending_Review"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
-        {% else %}
-        <li class="page-item disabled">
-            <a class="page-link" href="#" tabindex="-1">Previous</a>
-        </li>
-        {% endif %}
-        {% if noneClassification.number|add:'-4' > 1 %}
-        <li class="page-link"><a href="?pageno={{ page_obj.number|add:'-5' }}#Application_Pending_Review">&hellip;</a></li>
-        {% endif %}
-  
-    {% for i in noneClassification.paginator.page_range %}
-    {% if noneClassification.number == i %}
-        <li class="page-item active">
-            <a class="page-link" href="#">{{ i }} <span class="sr-only">(current)</span></a></li>
-    {% elif i > noneClassification.number|add:'-5' and i < noneClassification.number|add:'5' %}
-        <li class="page-link"><a href="?pageno={{ i }}#Application_Pending_Review">{{ i }}</a></li>
-    {% endif %}
-    {% endfor %}
-    {% if noneClassification.paginator.num_pages > noneClassification.number|add:'4' %}
-    <li class="page-link"><a href="?pageno={{ noneClassification.number|add:'5' }}#Application_Pending_Review">&hellip;</a></li>
-    {% endif %}
-  
-    {% if noneClassification.has_next %}
-     <li class="page-link"><a href="?pageno={{ noneClassification.next_page_number }}#Application_Pending_Review"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
-    {% else %}
-    <li class="page-item disabled">
-        <a class="page-link" href="#" tabindex="-1">Next</a>
-    </li>
-    {% endif %}
-    </ul>
-  </nav>
-    {% endif %} 
-  </div>
-    </div>
-  </div>
+  {% for i in noneClassification.paginator.page_range %}
+  {% if noneClassification.number == i %}
+      <li class="page-item active">
+          <a class="page-link" href="#">{{ i }} <span class="sr-only">(current)</span></a></li>
+  {% elif i > noneClassification.number|add:'-5' and i < noneClassification.number|add:'5' %}
+      <li class="page-link"><a href="?page={{ i }}">{{ i }}</a></li>
+  {% endif %}
+  {% endfor %}
+  {% if noneClassification.paginator.num_pages > noneClassification.number|add:'4' %}
+  <li class="page-link"><a href="?page={{ noneClassification.number|add:'5' }}">&hellip;</a></li>
+  {% endif %}
 
-
-
-
-  <!-- Test tab Link End -->
+  {% if noneClassification.has_next %}
+   <li class="page-link"><a href="?page={{ noneClassification.next_page_number }}"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
+  {% else %}
+  <li class="page-item disabled">
+      <a class="page-link" href="#" tabindex="-1">Next</a>
+  </li>
+  {% endif %}
+  </ul>
+</nav>
+  {% endif %} 
+</div>
+</div>
 
 {% for noneClass in noneClassification %}
 <div class="modal fade" id="editNoneApplicantModal-{{forloop.counter}}" role="dialog">
@@ -873,25 +858,22 @@ thead input {
 {% block javascript %}
 {% include 'ml_fraudulent_app/adminlte/lib/_scripts.html' %}
 <script>
-  $('#myTab a').click(function(e) {
-    var scrollHeight = $(document).scrollTop();
-    $(this).tab('show');
-    setTimeout(function() {
-      $(window).scrollTop(scrollHeight );
-  }, 5);
-  });
+  function openClassification(evt, classificationType) {
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+      tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+      tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(classificationType).style.display = "block";
+    evt.currentTarget.className += " active";
+  }
   
-  // store the currently selected tab in the hash value
-  $("ul.nav-tabs > li > a").on("shown.bs.tab", function(e) {
-    var id = $(e.target).attr("href").substr(1);
-    window.location.hash = id;
-  });
-  
-  // on load of the page: switch to the currently selected tab
-  var hash = window.location.hash;
-  $('#myTab a[href="' + hash + '"]').tab('show');
-  
-
+  // Get the element with id="defaultOpen" and click on it
+  document.getElementById("defaultOpen").click();
 
     function showValue(){
       var selectedpage = document.getElementById("pageno").value;

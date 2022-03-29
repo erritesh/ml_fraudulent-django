@@ -89,9 +89,9 @@ def home(request):
     # data = json.loads(json_records)
     
     #template_to_see = render_template('updatecustomer.html', customers = customers)
-    pagesno = request.GET.get('selectedpage')
+    #pagesno = request.GET.get('selectedpage')
 
-    finalpage = int(pagesno or 10)
+    #finalpage = int(pagesno or 10)
     
     #print(pagesno)
 
@@ -111,16 +111,15 @@ def home(request):
     
     noneClassification_list= Applicant_Details.objects.filter(classification='').values('app_email', 'app_id', 'app_mailing', 'app_onphone', 'app_ssn', 'app_start_time', 'app_submission_time', 'applicant_name', 'classification', 'geoLocation', 'origin_ip', 'renter', 'requested_amount', 'unit_type','risk_table__Decision_Criteria','risk_table__predict_class','risk_table__Risk_Score').order_by('app_id')
     
-    page = request.GET.get('page', 1)
-    paginator = Paginator(noneClassification_list, 10)
-
+    page1 = request.GET.get('pageno', 1)
+    nonepaginator = Paginator(noneClassification_list, 10)
     try:
-        noneClassification = paginator.page(page)
+        noneClassification = nonepaginator.page(page1)
     except PageNotAnInteger:
-        noneClassification = paginator.page(1)
+        noneClassification = nonepaginator.page(1)
     except EmptyPage:
-       noneClassification = paginator.page(paginator.num_pages)
-    
+       noneClassification = nonepaginator.page(nonepaginator.num_pages)
+       
     context = { 
                 "total_query_set":total_query_set,
                 "low_query_set":lowCount,
@@ -131,8 +130,6 @@ def home(request):
                 "noneClassification":noneClassification,       
     } 
     return render(request,"ml_fraudulent_app/index.html",context)
-
-
 
 
 def pageview(request):
@@ -204,8 +201,6 @@ def ApplicantUpdate(request,app_id):
                 geoLocation=country_name,
                 classification =classification,
             )
-            
-
             risk = Risk_Table(
                 app_id = app_id,
                 classification =classification,
@@ -215,13 +210,12 @@ def ApplicantUpdate(request,app_id):
     except Applicant_Details.DoesNotExist:
         raise Http404('Applicant Details does not exist')
 
-    
     applicant_details.save()
     risk.save(update_fields=['classification'])
     messages.add_message(request,messages.INFO,'Data has been updated Successfully !')
 
-    return redirect('home')
-    #return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    #return redirect('home')
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     #return redirect("ml_fraudulent_app/index.html")
 
 def logout(request):
