@@ -193,115 +193,15 @@ thead input {
   <!--Start Test  tabs link -->
   <ul class="nav nav-tabs" id="myTab">
     <li class="nav-item">
-      <a class="nav-link active" href="#All_Applications" data-target="#All_Applications" data-toggle="tab" style="color:#000000;font-size:16px;overflow: hidden">All Applications</a>
+      <a class="nav-link active" href="#Application_Pending_Review" data-target="#Application_Pending_Review" data-toggle="tab" style="color:#000000;font-size:16px;overflow: hidden">Application Pending Review</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" href="#Application_Pending_Review" data-target="#Application_Pending_Review" data-toggle="tab" style="color:#000000;font-size:16px;overflow: hidden">Application Pending Review</a>
+      <a class="nav-link " href="#All_Applications" data-target="#All_Applications" data-toggle="tab" style="color:#000000;font-size:16px;overflow: hidden">All Applications</a>
     </li>
   </ul>
   
   <div class="tab-content">
-    <div class="tab-pane in active" id="All_Applications">
-      <table class="table table-hover" id="usersData" style="width:100%">
-        <thead>
-          <tr>
-            <th style="text-align:left">ID</th>
-            <th style="text-align:left">Submission Time</th>
-            <th style="text-align:left">Applicant Name</th>
-            <th style="text-align:left">Requested Amount</th>
-            <th style="text-align:left">Classification</th>
-            <th style="text-align:left">Risk Score</th>
-            <th style="text-align:center">Action</th>
-          </tr>
-        </thead>
-        <tbody>  
-         {% comment %} {% for app in applicant_list %}  {% endcomment %}
-         {% if applicant_list %}  
-         {% for app in applicant_list %} 
-          <tr>
-            <td>{{app.app_id}}</td> 
-            <td>{{app.app_submission_time | date:"Y-m-d, H:m:s"}}</td>
-            <td>{{app.applicant_name}}</td>
-            <td>${{app.requested_amount}} </td>
-            <!--<td>{{app.origin_ip}}</td>
-            <td>{{app.geoLocation}}</td> -->
-            <td>{{app.classification}}</td>
-            <td>{{app.risk_table__Risk_Score}}
-                {% if app.risk_table__Risk_Score <= 25 %}
-                <div class="progress progress-xs progress-striped active">
-                    <div class="progress-bar bg-success" style="width:25%"></div>
-                  </div> 
-                  {% elif app.risk_table__Risk_Score <= 50 %} 
-                  <div class="progress progress-xs">
-                    <div class="progress-bar bg-info" style="width: 50%;background-color:#FDDA0D !important;"></div>
-                  </div>
-                  {% elif app.risk_table__Risk_Score <= 75 %}
-                  <div class="progress progress-xs">
-                    <div class="progress-bar bg-warning" style="width: 75%"></div>
-                  </div>
-                  {% elif app.risk_table__Risk_Score <= 100 %}
-                  <div class="progress progress-xs">
-                    <div class="progress-bar bg-danger" style="width: 95%"></div>
-                  </div>
-                  {% else %}
-                  <div class="progress progress-xs">
-                    <div class="progress-bar bg-secondary" style="width: 0%"></div>
-                  </div>
-                  {% endif %}
-                </td>
-                <td> 
-                  <center><a href="#editApplicantModal-{{forloop.counter}}" class="btn btn-info btn-sm" data-toggle="modal"><i class="fas fa-user-edit"></i> &nbsp; Review</a></center>
-              </td>     
-          </tr>
-          {% empty %}
-            <tr><td colspan="5">Currently no Data Available</td></tr>
-          {% endfor %}
-          {% endif %}
-        </tbody> 
-    </table>
-  
-    <div>
-      {% if applicant_list.has_other_pages %}
-    <nav aria-label="Page navigation example">
-    <ul class="pagination">
-        {% if applicant_list.has_previous %}
-        <li class="page-link"><a href="?page={{ applicant_list.previous_page_number }}#All_Applications"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
-        {% else %}
-        <li class="page-item disabled">
-            <a class="page-link" href="#" tabindex="-1">Previous</a>
-        </li>
-        {% endif %}
-        {% if applicant_list.number|add:'-4' > 1 %}
-        <li class="page-link"><a href="?page={{ page_obj.number|add:'-5' }}#All_Applications">&hellip;</a></li>
-        {% endif %}
-  
-    {% for i in applicant_list.paginator.page_range %}
-    {% if applicant_list.number == i %}
-        <li class="page-item active">
-            <a class="page-link" href="#">{{ i }} <span class="sr-only">(current)</span></a></li>
-    {% elif i > applicant_list.number|add:'-5' and i < applicant_list.number|add:'5' %}
-        <li class="page-link"><a href="?page={{ i }}#All_Applications">{{ i }}</a></li>
-    {% endif %}
-    {% endfor %}
-    {% if applicant_list.paginator.num_pages > applicant_list.number|add:'4' %}
-    <li class="page-link"><a href="?page={{ applicant_list.number|add:'5' }}#All_Applications">&hellip;</a></li>
-    {% endif %}
-  
-    {% if applicant_list.has_next %}
-     <li class="page-link"><a href="?page={{ applicant_list.next_page_number }}#All_Applications"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
-    {% else %}
-    <li class="page-item disabled">
-        <a class="page-link" href="#" tabindex="-1">Next</a>
-    </li>
-    {% endif %}
-    </ul>
-  </nav>
-    {% endif %} 
-  </div>
-  </div>
- 
-
-    <div class="tab-pane fade" id="Application_Pending_Review">
+    <div class="tab-pane in active" id="Application_Pending_Review">
       
       <table class="table table-hover" id="withoutClassificationData" style="width:100%">
         <thead>
@@ -328,23 +228,23 @@ thead input {
             <td>{{app.risk_table__Risk_Score}}
                 {% if app.risk_table__Risk_Score <= 25 %}
                 <div class="progress progress-xs progress-striped active">
-                    <div class="progress-bar bg-success" style="width:25%"></div>
+                    <div class="progress-bar bg-success" style="width:{{app.risk_table__Risk_Score}}%"></div>
                   </div> 
                   {% elif app.risk_table__Risk_Score <= 50 %} 
                   <div class="progress progress-xs">
-                    <div class="progress-bar bg-info" style="width: 50%;background-color:#FDDA0D !important;"></div>
+                    <div class="progress-bar bg-info" style="width: {{app.risk_table__Risk_Score}}%;background-color:#FDDA0D !important;"></div>
                   </div>
                   {% elif app.risk_table__Risk_Score <= 75 %}
                   <div class="progress progress-xs">
-                    <div class="progress-bar bg-warning" style="width: 75%"></div>
+                    <div class="progress-bar bg-warning" style="width: {{app.risk_table__Risk_Score}}%"></div>
                   </div>
                   {% elif app.risk_table__Risk_Score <= 100 %}
                   <div class="progress progress-xs">
-                    <div class="progress-bar bg-danger" style="width: 95%"></div>
+                    <div class="progress-bar bg-danger" style="width: {{app.risk_table__Risk_Score}}%"></div>
                   </div>
                   {% else %}
                   <div class="progress progress-xs">
-                    <div class="progress-bar bg-secondary" style="width: 0%"></div>
+                    <div class="progress-bar bg-secondary" style="width: {{app.risk_table__Risk_Score}}%"></div>
                   </div>
                   {% endif %}
                 </td>
@@ -399,6 +299,106 @@ thead input {
     {% endif %} 
   </div>
     </div>
+  
+  <div class="tab-pane in fade" id="All_Applications">
+    <table class="table table-hover" id="usersData" style="width:100%">
+      <thead>
+        <tr>
+          <th style="text-align:left">ID</th>
+          <th style="text-align:left">Submission Time</th>
+          <th style="text-align:left">Applicant Name</th>
+          <th style="text-align:left">Requested Amount</th>
+          <th style="text-align:left">Classification</th>
+          <th style="text-align:left">Risk Score</th>
+          <th style="text-align:center">Action</th>
+        </tr>
+      </thead>
+      <tbody>  
+       {% comment %} {% for app in applicant_list %}  {% endcomment %}
+       {% if applicant_list %}  
+       {% for app in applicant_list %} 
+        <tr>
+          <td>{{app.app_id}}</td> 
+          <td>{{app.app_submission_time | date:"Y-m-d, H:m:s"}}</td>
+          <td>{{app.applicant_name}}</td>
+          <td>${{app.requested_amount}} </td>
+          <!--<td>{{app.origin_ip}}</td>
+          <td>{{app.geoLocation}}</td> -->
+          <td>{{app.classification}}</td>
+          <td>{{app.risk_table__Risk_Score}}
+              {% if app.risk_table__Risk_Score <= 25 %}
+              <div class="progress progress-xs progress-striped active">
+                  <div class="progress-bar bg-success" style="width:{{app.risk_table__Risk_Score}}%"></div>
+                </div> 
+                {% elif app.risk_table__Risk_Score <= 50 %} 
+                <div class="progress progress-xs">
+                  <div class="progress-bar bg-info" style="width: {{app.risk_table__Risk_Score}}%;background-color:#FDDA0D !important;"></div>
+                </div>
+                {% elif app.risk_table__Risk_Score <= 75 %}
+                <div class="progress progress-xs">
+                  <div class="progress-bar bg-warning" style="width: {{app.risk_table__Risk_Score}}%"></div>
+                </div>
+                {% elif app.risk_table__Risk_Score <= 100 %}
+                <div class="progress progress-xs">
+                  <div class="progress-bar bg-danger" style="width: {{app.risk_table__Risk_Score}}%"></div>
+                </div>
+                {% else %}
+                <div class="progress progress-xs">
+                  <div class="progress-bar bg-secondary" style="width: {{app.risk_table__Risk_Score}}%"></div>
+                </div>
+                {% endif %}
+              </td>
+              <td> 
+                <center><a href="#editApplicantModal-{{forloop.counter}}" class="btn btn-info btn-sm" data-toggle="modal"><i class="fas fa-user-edit"></i> &nbsp; Review</a></center>
+            </td>     
+        </tr>
+        {% empty %}
+          <tr><td colspan="5">Currently no Data Available</td></tr>
+        {% endfor %}
+        {% endif %}
+      </tbody> 
+  </table>
+
+  <div>
+    {% if applicant_list.has_other_pages %}
+  <nav aria-label="Page navigation example">
+  <ul class="pagination">
+      {% if applicant_list.has_previous %}
+      <li class="page-link"><a href="?page={{ applicant_list.previous_page_number }}#All_Applications"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
+      {% else %}
+      <li class="page-item disabled">
+          <a class="page-link" href="#" tabindex="-1">Previous</a>
+      </li>
+      {% endif %}
+      {% if applicant_list.number|add:'-4' > 1 %}
+      <li class="page-link"><a href="?page={{ page_obj.number|add:'-5' }}#All_Applications">&hellip;</a></li>
+      {% endif %}
+
+  {% for i in applicant_list.paginator.page_range %}
+  {% if applicant_list.number == i %}
+      <li class="page-item active">
+          <a class="page-link" href="#">{{ i }} <span class="sr-only">(current)</span></a></li>
+  {% elif i > applicant_list.number|add:'-5' and i < applicant_list.number|add:'5' %}
+      <li class="page-link"><a href="?page={{ i }}#All_Applications">{{ i }}</a></li>
+  {% endif %}
+  {% endfor %}
+  {% if applicant_list.paginator.num_pages > applicant_list.number|add:'4' %}
+  <li class="page-link"><a href="?page={{ applicant_list.number|add:'5' }}#All_Applications">&hellip;</a></li>
+  {% endif %}
+
+  {% if applicant_list.has_next %}
+   <li class="page-link"><a href="?page={{ applicant_list.next_page_number }}#All_Applications"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
+  {% else %}
+  <li class="page-item disabled">
+      <a class="page-link" href="#" tabindex="-1">Next</a>
+  </li>
+  {% endif %}
+  </ul>
+</nav>
+  {% endif %} 
+</div>
+</div>
+    
   </div>
 
 
@@ -552,10 +552,12 @@ thead input {
                           {% if noneClass.classification == 'Fraud' %}
                           <option value="{{noneClass.classification}}">{{noneClass.classification}}</option>
                           <option value="Legitimate">Legitimate</option>
+                          <option value="">Select Category</option>
           
                           {% elif app.classification == 'Legitimate'%}
                           <option value="{{noneClass.classification}}">{{noneClass.classification}}</option>
                           <option value="Fraud">Fraud</option>
+                          <option value="">Select Category</option>
                           {% else %}
                           <option value="">Select Category</option>
                           <option value="Fraud">Fraud</option>
@@ -780,10 +782,12 @@ thead input {
                             {% if app.classification == 'Fraud' %}
                             <option value="{{app.classification}}">{{app.classification}}</option>
                             <option value="Legitimate">Legitimate</option>
+                            <option value="">Select Category</option>
 
                             {% elif app.classification == 'Legitimate'%}
                             <option value="{{app.classification}}">{{app.classification}}</option>
                             <option value="Fraud">Fraud</option>
+                            <option value="">Select Category</option>
                             {% else %}
                             <option value="">Select Category</option>
                             <option value="Fraud">Fraud</option>
@@ -912,16 +916,27 @@ thead input {
                 }
             })  
           }
-
+          
+function tempAlert(msg,duration){
+ var el = document.createElement("div");
+ el.setAttribute("style","position:absolute;top:10%;left:21%;font-Size:17px;");
+ el.innerHTML = '<div class="alert alert-info" style="height:44px;width:280%" role="alert"><center>'+msg+'</center></div>'
+ setTimeout(function(){
+  el.parentNode.removeChild(el);
+ },duration);
+ document.body.appendChild(el);
+}
       $('#resetScript').click(function(){
         $('#img').show(); 
         $.ajax({
         url: "/output",
         context: document.body,
          success:function(result){
-          alert("Table has been updated successfully");
-             $('#img').hide();
-             location.reload(true); 
+            tempAlert("Table has been updated successfully!",2000);
+            $('#img').hide();
+            setTimeout(function(){
+              window.location.reload(1);
+           }, 2000);    
          }
          
       });
@@ -952,16 +967,20 @@ $('#singlegeoupdate').click(function(){
 });
 });
 
+{% comment %} Re Evaluate Script  {% endcomment %}
+
 $('#reevaluate').click(function(){
                 $('#img').show();
                 $.ajax({
                   url: "/evaluate",
                   context: document.body,
                    success:function(result){
-                       $('#img').hide(); 
-                      console.log(result);
-                      alert("Table has been updated successfully");
-                      location.reload(true);
+                    $('#img').hide(); 
+                    tempAlert("Table has been updated successfully!",2000);
+                  $('#img').hide();
+                    setTimeout(function(){
+                    window.location.reload(1);
+                    }, 2000);
                    }
                 });     
   });
@@ -969,9 +988,6 @@ $('#reevaluate').click(function(){
 $('#withoutClassificationData').dataTable( {
   "paging": false,
 } );
-
-
-
 $(document).ready(function () {
             $('#usersData').DataTable({
             "order":[[0, "asc"]],
