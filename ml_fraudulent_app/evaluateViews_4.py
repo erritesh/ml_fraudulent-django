@@ -1,4 +1,3 @@
-#Import necessary dataset
 from sqlalchemy import create_engine
 import mysql.connector
 import pandas as pd
@@ -21,6 +20,7 @@ from sklearn.metrics import accuracy_score
 from ml_fraudulent_app.models import Importance_rank_table
 
 def evaluateViews(request):
+  
   #read the df
   #df = pd.read_excel(r'tailored_MASTER_altered.xlsx')
   db_connection = mysql.connector.connect(
@@ -40,8 +40,6 @@ def evaluateViews(request):
   df.columns = ['Application ID', 'Application Start Time', 'Application End Time', 'Applicant Name', 'Applicant Email', 'Applicant Phone     #', 'Applicant Social Security #',
                   'Applicant Address', 'Renter Quality', 'Unit Type', 'Requested Amount', 'Originating IP Address', 'Classification',   "Originating Country", 'Edited']
   print(df.dtypes)
-
-  #format the data (time interval)
 
   #format the data (time interval)
   df['Application Start Time'] = pd.to_datetime(df['Application Start Time'])
@@ -126,7 +124,7 @@ def evaluateViews(request):
           if index!=len(path)-1:
               # Do we go under or over the threshold ?
               if (children_left[node] == path[index+1]):
-                  mask += "{} <= {}\t".format(column_names[feature[node]], round(threshold[node],2))
+                  mask += "{} <= {}\t".format(column_names[feature[node]],round(threshold[node],2))
               else:
                   mask += "{} > {}\t".format(column_names[feature[node]], round(threshold[node],2))
       # We insert the & at the right places
@@ -184,7 +182,7 @@ def evaluateViews(request):
   #rename the leave_id as the key from rules
   # setting a decision rule data copy for importance rank table only
   decision_rule_data = pd.DataFrame()
-  decision_rule_data  = decision_rule.copy()
+  decision_rule_data = decision_rule.copy()
   decision_rule_data['leave_id'] = getList(rules)
 
   # leave id for each record
@@ -195,23 +193,40 @@ def evaluateViews(request):
   result = pd.DataFrame()
   result['Application ID'] = df['Application ID']
   result['Classification'] = df['Classification']
-  result['Predict Class'] =  y_pred_class
-  result['Risk Score'] =  round(y_prob_prob*100,1)
+  result['Predict Class'] = y_pred_class
+  result['Risk Score'] = round(y_prob_prob*100,1)
   result['leave_id'] = leave_id_df['leave_id']
 
   final_result = pd.merge(result,decision_rule_data, how = 'left',on ='leave_id').drop('leave_id', axis = 1)
 
   fraud_result = final_result[(final_result['Classification'] == 'Fraud')]
+  total_fraud = fraud_result.shape[0]
   criteria_count_fraud = pd.DataFrame(fraud_result.iloc[:,4:].stack().reset_index(level=1, drop=True).rename('Decision Criteria'))
   affected_fraud = pd.DataFrame(criteria_count_fraud.groupby('Decision Criteria').size()).reset_index()
   affected_fraud.columns = ('Decision Criteria','Fraud')
   importance_rank_fraud = affected_fraud.sort_values('Fraud',ascending= False).reset_index(drop=True)
-  importance_rank_fraud = importance_rank_fraud[importance_rank_fraud['Decision Criteria'] != 'None'] 
-   
-  total_result = final_result[(final_result['Classification'] == 'Fraud')]
+  importance_rank_fraud = importance_rank_fraud[importance_rank_fraud['Decision Criteria'] != 'None']
+  
+  legitimate_result = final_result[(final_result['Classification'] == 'Legitimate')]
+  total_legitimate = legitimate_result.shape[0]
+  criteria_count_legitimate = pd.DataFrame(legitimate_result.iloc[:,4:].stack().reset_index(level=1, drop=True).rename('Decision Criteria'))
+  affected_legitimate = pd.DataFrame(criteria_count_legitimate.groupby('Decision Criteria').size()).reset_index()
+  affected_legitimate.columns = ('Decision Criteria','Legitimate')
+  importance_rank_legitimate = affected_legitimate.sort_values('Legitimate',ascending= False).reset_index(drop=True)
+  importance_rank_legitimate = importance_rank_legitimate[importance_rank_legitimate['Decision Criteria'] != 'None'] 
+  
+  total_result = final_result[(final_result['Classification'] == 'Fraud')|(final_result['Classification'] == 'Legitimate')]
   total = total_result.shape[0]
-  importance_rank_fraud['Importance'] = round((importance_rank_fraud['Fraud']/total*100).astype(float),2)
-  importance_rank = importance_rank_fraud.sort_values('Importance',ascending= False).head(10).iloc[:, [0] + [-1]].reset_index(drop=True)
+  criteria_count_total = pd.DataFrame(total_result.iloc[:,4:].stack().reset_index(level=1, drop=True).rename('Decision Criteria'))
+  affected_total = pd.DataFrame(criteria_count_total.groupby('Decision Criteria').size()).reset_index()
+  affected_total.columns = ('Decision Criteria','Total Count')
+  importance_rank_total = affected_total.sort_values('Total Count',ascending= False).reset_index(drop=True)
+  importance_rank_total = importance_rank_total[importance_rank_total['Decision Criteria'] != 'None']
+
+  importance_rank = pd.merge(importance_rank_total,importance_rank_fraud, on ='Decision Criteria').merge(importance_rank_legitimate, on  ='Decision Criteria')
+  importance_rank['Importance'] = round((importance_rank['Fraud'] / importance_rank['Total Count']*100).astype(float),2)
+ 
+  importance_rank = importance_rank[importance_rank['Importance'] > 50].sort_values('Importance',ascending= False).head(10).iloc[:, [0] + [-1]].reset_index(drop=True)
   
 
   decision_rule_data = decision_rule_data.applymap(lambda x: x.strip() if isinstance(x, str) else x) # removing all trailing and leading space
@@ -379,7 +394,7 @@ def evaluateViews(request):
   updated_decision_table.rename(columns = {'Application ID' : 'app_id' , 'Classification' : 'classification', 'Predict Class' : 'Predict_Class' , 'Risk Score' : 'Risk_Score', 'Decision Criteria' : 'Decision_Criteria'}, inplace=True)
   print("================Table Records===============")
   print(updated_decision_table)  # ml_fraudulent_app_risk_table
-  #Connection to DB
+    #Connection to DB
   con = MySQLdb.connect('localhost','root','Admin', 'ml_fraud_detection')
   my_sqlconn= create_engine("mysql+mysqldb://root:Admin@localhost/ml_fraud_detection")
   df = pd.DataFrame(data=updated_decision_table)
@@ -390,21 +405,29 @@ def evaluateViews(request):
 
     #df.to_sql(con=my_sqlconn,name='ml_fraudulent_app_risk_table',if_exists='replace',index=False)
     print("Risk table has been updated successfully !")
-  
-  importance_rank.rename(columns = {'Decision Criteria' : 'Decision_Criteria', 'Importance' : 'Importance'}, inplace=True)
-  # connect to DB to store importance_rank values
-  con = MySQLdb.connect('localhost','root','Admin', 'ml_fraud_detection')
-  my_sqlconn= create_engine("mysql+mysqldb://root:Admin@localhost/ml_fraud_detection")
-  df = pd.DataFrame(data=importance_rank)
-  with my_sqlconn.connect() as con:
-    con.execute("TRUNCATE TABLE %s" % 'ml_fraudulent_app_importance_rank_table')
-  df.to_sql(name='ml_fraudulent_app_importance_rank_table', con=my_sqlconn, if_exists='append',index=False)
-  print("Importance Rank Table has been updated successfully !")
-  print("================Imp Records===============")
-  print(importance_rank)
-  
-  accuracy = tree_model.score(X_train,y_train)
-  print("================Accuracy Score=============")
-  print('accuracy score is: ' + str(accuracy))
-  return HttpResponse("ML Script Runned successfully")  
+    importance_rank.rename(columns = {'Decision Criteria' : 'Decision_Criteria', 'Importance' : 'Importance'}, inplace=True)
+    
+    # connect to DB to store importance_rank values
+    con = MySQLdb.connect('localhost','root','Admin', 'ml_fraud_detection')
+    my_sqlconn= create_engine("mysql+mysqldb://root:Admin@localhost/ml_fraud_detection")
+    df = pd.DataFrame(data=importance_rank)
 
+    with my_sqlconn.connect() as con:
+
+      con.execute("TRUNCATE TABLE %s" % 'ml_fraudulent_app_importance_rank_table')
+
+    df.to_sql(name='ml_fraudulent_app_importance_rank_table', con=my_sqlconn, if_exists='append',index=False)
+
+
+   
+    print("Importance Rank Table has been updated successfully !")
+    print("================Imp Records===============")
+
+  print(importance_rank)
+  print(updated_decision_table)
+  accuracy = tree_model.score(X_train,y_train)
+  print('accuracy score is: ' + str(accuracy))
+
+  return HttpResponse("ML Script Runned successfully") 
+
+#invoke my function
